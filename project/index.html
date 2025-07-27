@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- https://hungryturtlecode.com/projects/parallax-mountains/ -->
+  <!-- https://github.com/HungryTurtleCode/hackilax/blob/master/index.html -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hungry turtle code</title>
+    <link rel="stylesheet" href="src/main.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="fixed-section firstpage">
+        <h1 class="heading">Hungry Turtle Code</h1>
+        <div class="background" data-parallax-speed="0.04">
+          <div class="bg-block"></div>
+        </div>
+        <div class="middleground" data-parallax-speed="0.1">
+          <div class="mg-block"></div>
+        </div>
+        <div class="foreground" data-parallax-speed="0.4">
+          <div class="fg-block"></div>
+        </div>
+      </div>
+      <div class="fixed-section secondpage">
+        <h1 class="heading">
+          <span>Hungry&nbsp;</span><span>Turtle&nbsp;</span><span>Code</span>
+        </h1>
+        <img
+          src="https://res.cloudinary.com/djxscnpzf/image/upload/v1538571617/hungryturtle_high3_af4hyq.png"
+          class="turtlemascot"
+          alt=""
+        />
+      </div>
+      <div class="thirdpage">
+        <div class="progress-line"></div>
+        <div class="title">
+          <h2>Hello Parallax</h2>
+        </div>
+        <div class="imgs">
+          <img
+            src="https://picsum.photos/id/93/400/400"
+            alt=""
+            class="img img1"
+            data-parallax-speed="0.1"
+          />
+          <img
+            src="https://picsum.photos/id/103/400/400"
+            alt=""
+            class="img img2"
+            data-parallax-speed="0.25"
+          />
+        </div>
+        <div class="bottom-sect"></div>
+      </div>
+    </div>
+    <script type="module" src="bundle.js"></script>
+  </body>
+</html>

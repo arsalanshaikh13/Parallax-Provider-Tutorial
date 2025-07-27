@@ -1,0 +1,7 @@
+.eslintignore
+node_modules
+dist
+trowaway.js
+jest_debug.log
+debug-hook-jest.js
+dummy-file.js
