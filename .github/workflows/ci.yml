@@ -10,30 +10,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-  strategy:
-    matrix:
-      node-version: [18.x]
+    strategy:
+      matrix:
+        node-version: [18.x]
 
-  steps:
-    - uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install
+      - name: Install dependencies
+        run: yarn install
 
-    - name: Lint code
-      run: yarn lint
+      - name: Lint code
+        run: yarn lint
 
-    - name: Format checkout
-      run: yarn format:check
+      - name: Format checkout
+        run: yarn format:check
 
-    - name: Run Tests
-      run: yarn test --ci --coverage
+      - name: Run Tests
+        run: yarn test --ci --coverage
 
-    - name: Build project
-      run: yarn build
+      - name: Build project
+        run: yarn build
