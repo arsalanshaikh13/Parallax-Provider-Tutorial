@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1753629982039" clover="3.2.0">
-  <project timestamp="1753629982040" name="All files">
+<coverage generated="1753630088630" clover="3.2.0">
+  <project timestamp="1753630088631" name="All files">
     <metrics statements="158" coveredstatements="0" conditionals="3" coveredconditionals="0" methods="3" coveredmethods="0" elements="164" coveredelements="0" complexity="0" loc="158" ncloc="158" packages="1" files="3" classes="3"/>
     <file name="eslint.config.js" path="C:\Users\DELL\ArsVSCode\CS50p_project\project_aFinal\website\website 2.0\animations\scroll\parallaxturtlelib\eslint.config.js">
       <metrics statements="56" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
