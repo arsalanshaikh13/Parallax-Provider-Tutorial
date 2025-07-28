@@ -44,7 +44,7 @@ jobs:
     name: Publish to npm
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: startwith(github.ref, 'refs/tags/v') # only on version tags
+    if: startswith(github.ref, 'refs/tags/v') # only on version tags
 
     steps:
       - name: Checkout code
