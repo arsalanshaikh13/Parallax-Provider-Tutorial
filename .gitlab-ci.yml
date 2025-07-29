@@ -1,0 +1,38 @@
+default:
+  before_script:
+    - yarn install
+
+stages:
+  - test
+  - build
+  - release
+
+lint_and_test:
+  stage: test
+  script:
+    - yarn lint
+    - yarn test
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "gitlabci"'
+      when: always
+
+build:
+  stage: build
+  script:
+    - yarn build
+  artifacts:
+    paths:
+      - dist/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "gitlabci"'
+      when: always
+
+release:
+  stage: release
+  script:
+    - npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+    - npm publish
+  rules:
+    - if: '$CI_COMMIT_TAG == /^v[0-9]+.*$/'
+      when: always
