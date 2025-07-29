@@ -9,16 +9,10 @@ echo "Adding Gitlab remote"
 git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
 
 
-
-echo "Fetching latest from Gitlab"
-git fetch gitlab ${GITLAB_BRANCH}   
-
-echo "Rebasing Github HEAD onto Gitlab branch: ${GITLAB_BRANCH}"
-git pull gitlab "${GITLAB_BRANCH}" --rebase
+echo "Force pushing latest commit GitHub code to GitLab..."
+git push --force gitlab HEAD:${GITLAB_BRANCH}
 
 
-echo "Pushing latest commit to Gitlab branch: ${GITLAB_BRANCH}"
-git push gitlab HEAD:${GITLAB_BRANCH}
 
 echo " Triggering Gitlab pipeline..."
 curl -X POST \
