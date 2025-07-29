@@ -1,0 +1,35 @@
+name: Sync and Trigger GitLab CI
+
+on:
+  push:
+    branches:
+      - gitlabci # or your branch
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Github repo
+        uses: actions/checkout@v3
+
+      - name: Push to Gitlab
+        env:
+          GITLAB_PUSH_TOKEN: ${{ secrets.GITLAB_PUSH_TOKEN }}
+        run: git config --global user.email "ci@example.com" git config --global
+          user.name "CI bot"
+
+          git remote add gitlab
+          https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalanshaikh13/Parallax-Provider-Tutorial.git
+          git push gitlab gitlabci
+      - name: Trigger GitLab Pipeline
+        env:
+          GITLAB_TRIGGER_TOKEN: ${{  secrets.GITLAB_TRIGGER_TOKEN  }}
+          GITLAB_PAT: ${{ secrets.GITLAB_PAT}}
+        run: |
+          echo $GITLAB_PAT gitlab PAT token
+          curl -X POST \
+          -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_PAT }}" \
+          -H "Content-Type: application/json" \
+          -d '{"ref":"gitlabci"}'
+          "https://gitlab.com/api/v4/projects/72053714/pipeline"
