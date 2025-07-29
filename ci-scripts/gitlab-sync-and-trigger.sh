@@ -11,7 +11,7 @@ git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalansha
 
 
 echo "Fetching latest from Gitlab"
-git fetch gitlab
+git fetch gitlab ${GITLAB_BRANCH}   
 
 echo "Rebasing Github HEAD onto Gitlab branch: ${GITLAB_BRANCH}"
 git pull gitlab "${GITLAB_BRANCH}" --rebase
