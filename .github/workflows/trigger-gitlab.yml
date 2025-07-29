@@ -8,6 +8,7 @@ on:
 jobs:
   trigger:
     runs-on: ubuntu-latest
+    environment: Parallax-Provider-Tutorial
 
     steps:
       - name: Debug secret
@@ -27,4 +28,4 @@ jobs:
           echo "Token (first 4 chars):$GITLAB_TRIGGER_TOKEN ${{  secrets.GITLAB_TRIGGER_TOKEN  }}" # debug optional
           curl -X POST "https://gitlab.com/api/v4/projects/72053714/trigger/pipeline" \
             -H "Content-Type: application/json" \
-            -d "{\"token\": \"${GITLAB_TRIGGER_TOKEN}\", \"ref\": \"gitlabci\"}"
+            -d "{\"token\": \"glptt-a7e828a89257cdf81a1686c60cafd9c27a23548d\", \"ref\": \"gitlabci\"}"
