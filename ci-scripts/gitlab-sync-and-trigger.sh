@@ -8,6 +8,15 @@ git config --global user.name "CI user"
 echo "Adding Gitlab remote"
 git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
 
+
+
+echo "Fetching latest from Gitlab"
+git fetch gitlab
+
+echo "Rebasing Github HEAD onto Gitlab branch: ${GITLAB_BRANCH}"
+git pull gitlab "${GITLAB_BRANCH}" --rebase
+
+
 echo "Pushing latest commit to Gitlab branch: ${GITLAB_BRANCH}"
 git push gitlab HEAD:${GITLAB_BRANCH}
 
