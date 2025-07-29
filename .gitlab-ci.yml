@@ -6,6 +6,8 @@ cache:
 
 default:
   before_script:
+    - corepack enable
+    - corepack prepare yarn@stable --activate
     - yarn install
 
 stages:
