@@ -10,21 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug secret
+      - name: Trigger GitLab Pipeline
         env:
           GITLAB_TRIGGER_TOKEN: ${{  secrets.GITLAB_TRIGGER_TOKEN  }}
+          GITLAB_PAT: ${{ secrets.GITLAB_PAT}}
         run: |
-          if [ -z "$GITLAB_TRIGGER_TOKEN" ]; then
-            echo " Secret missing"
-            exit 1
-          else
-            echo " Secret exists"
-          fi
-
-      - name: Trigger GitLab Pipeline
-        run: |
-          echo "Triggering Gitlab pipeline..."
-          echo "Token (first 4 chars):$GITLAB_TRIGGER_TOKEN ${{  secrets.GITLAB_TRIGGER_TOKEN  }}" # debug optional
           curl -X POST "https://gitlab.com/api/v4/projects/72053714/trigger/pipeline" \
+            -H "PRIVATE-TOKEN: $GITLAB_PAT" \
             -H "Content-Type: application/json" \
-            -d "{\"token\": \"glptt-a7e828a89257cdf81a1686c60cafd9c27a23548d\", \"ref\": \"gitlabci\"}"
+            -d "{ \"ref\": \"gitlabci\"}"
