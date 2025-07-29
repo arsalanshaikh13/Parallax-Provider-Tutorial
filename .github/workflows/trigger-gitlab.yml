@@ -8,15 +8,15 @@ on:
 jobs:
   trigger:
     runs-on: ubuntu-latest
-    env:
-      GITLAB_TRIGGER_TOKEN: ${{  secrets.GITLAB_TRIGGER_TOKEN  }}
 
     steps:
       - name: Trigger GitLab Pipeline
+        env:
+          GITLAB_TRIGGER_TOKEN: ${{  secrets.GITLAB_TRIGGER_TOKEN  }}
         run: |
           echo "Triggering Gitlab pipeline..."
-          echo "Token (first 4 chars): $(GITLAB_TRIGGER_TOKEN:0:4)" # debug optional
+          echo "Token (first 4 chars):$GITLAB_TRIGGER_TOKEN ${{  secrets.GITLAB_TRIGGER_TOKEN  }}" # debug optional
           curl -X POST \
-            -F token=$GITLAB_TRIGGER_TOKEN \
+            -F token=glptt-a7e828a89257cdf81a1686c60cafd9c27a23548d \
             -F ref=gitlabci \
             https://gitlab.com/api/v4/projects/72053714/trigger/pipeline
