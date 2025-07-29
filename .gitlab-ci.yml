@@ -6,8 +6,8 @@ cache:
 
 default:
   before_script:
-    - corepack enable
-    - corepack prepare yarn@stable --activate
+    - corepack disable # prevent auto Yarn v4 activation
+    - npm install -g yarn@1.22.22
     - yarn install
 
 stages:
