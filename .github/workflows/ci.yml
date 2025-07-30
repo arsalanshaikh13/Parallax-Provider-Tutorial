@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - main
+      # git does not take regex patterns but takes glob patterns
+      # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#filter-pattern-cheat-sheet
     tags:
-      - '/^v[0-9]+.*$' # Trigger release when pushing tags like v1.0.0
+      - 'v[0-9].[0-9]+.[0-9]+' # Trigger release when pushing tags like v1.0.0
 
 jobs:
   build-and-test:
