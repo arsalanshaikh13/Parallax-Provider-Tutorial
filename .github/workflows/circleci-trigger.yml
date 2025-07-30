@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Trigger CircleCI pipeline
         run: |
-          curl -X POST -H "content-type: application/json" ${CIRCLE_WEBHOOK_URL}
+          curl -X POST -H "content-type: application/json" ${CIRCLECI_WEBHOOK_URL}
 
         env:
           CIRCLECI_WEBHOOK_URL: ${{ secrets.CIRCLECI_WEBHOOK_URL }}
