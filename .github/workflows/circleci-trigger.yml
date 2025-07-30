@@ -1,0 +1,19 @@
+# https://support.circleci.com/hc/en-us/articles/360050351292-How-to-Trigger-a-Workflow-via-CircleCI-API-v2
+name: Trigger CircleCI
+
+on:
+  push:
+    branches:
+      - circleci
+jobs:
+  trigger-circleci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger CircleCI pipeline
+        env:
+          CIRCLECI_TOKEN: ${{ secrets.CIRCLECI_TOKEN }}
+        run: |
+          curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
+          --header 'Circle-Token: $CIRCLE_TOKEN' \
+          --header 'Content-Type: application/json' \
+          --data '{"branch": "circleci"}''
