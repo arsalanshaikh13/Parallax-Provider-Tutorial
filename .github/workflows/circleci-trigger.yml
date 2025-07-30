@@ -13,8 +13,8 @@ jobs:
       - name: Trigger CircleCI pipeline
         run: |
           curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
-            --header 'Circle-Token: ${CIRCLECI_TOKEN}' \
-            --header 'Content-Type: application/json' \
+            --header "Circle-Token: ${CIRCLECI_TOKEN}" \
+            --header "Content-Type: application/json" \
             --data '{"branch": "circleci"}'
 
         env:
