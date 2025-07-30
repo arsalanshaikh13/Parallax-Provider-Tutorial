@@ -10,10 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger CircleCI pipeline
-        env:
-          CIRCLECI_TOKEN: ${{ secrets.CIRCLECI_TOKEN }}
         run: |
           curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
-          --header 'Circle-Token: $CIRCLE_TOKEN' \
+          --header 'Circle-Token: ${CIRCLE_TOKEN}' \
           --header 'Content-Type: application/json' \
           --data '{"branch": "circleci"}'
+
+        env:
+          CIRCLECI_TOKEN: ${{ secrets.CIRCLECI_TOKEN }}
