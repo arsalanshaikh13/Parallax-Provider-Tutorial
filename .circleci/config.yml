@@ -1,13 +1,13 @@
 version: 2.1
 
 executors:
-  node-executor:
+  node_executor:
     docker:
       - image: cimg/node:18.20
 
 jobs:
   install:
-    executor: node-executor
+    executor: node_executor
     steps:
       - checkout
       - restore_cache:
@@ -66,13 +66,15 @@ workflows:
             - install
           filters:
             branches:
-              - circleci
+              only:
+                - circleci
       - build:
           requires:
             - lint_and_test
           filters:
             branches:
-              - circleci
+              only:
+                - circleci
 
       - publish:
           requires:
