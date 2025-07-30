@@ -1,0 +1,86 @@
+version: 2.1
+
+executors:
+  node-executor:
+    docker:
+      - image: cimg/node:18.20
+
+jobs:
+  install:
+    executor: node-executor
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-deps-{{ checksum "yarn.lock" }}
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: yarn-deps-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+
+  lint_and_test:
+    executor: node_executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: yarn lint
+      - run: yarn test
+
+  build:
+    executor: node_executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: yarn build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  publish:
+    executor: node_executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Authenticate with npm
+          command: |
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run: npm publish
+
+workflows:
+  version: 2
+  build_test_publish:
+    jobs:
+      - install
+      - lint_and_test:
+          requires:
+            - install
+          filters:
+            branches:
+              - circleci
+      - build:
+          requires:
+            - lint_and_test
+          filters:
+            branches:
+              - circleci
+
+      - publish:
+          requires:
+            - build
+
+          filters:
+            tags:
+              only: /^v[0-9]+.*$/
+
+            branches:
+              ignore: /.*/
