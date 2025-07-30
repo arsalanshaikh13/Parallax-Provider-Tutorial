@@ -1,4 +1,5 @@
 # https://support.circleci.com/hc/en-us/articles/360050351292-How-to-Trigger-a-Workflow-via-CircleCI-API-v2
+# https://circleci.com/docs/triggers-overview/#trigger-a-pipeline-from-a-custom-webhook
 name: Trigger CircleCI
 
 on:
@@ -11,7 +12,10 @@ jobs:
     steps:
       - name: Trigger CircleCI pipeline
         run: |
-          curl -X POST -H "content-type: application/json" ${CIRCLECI_WEBHOOK_URL}
+          curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
+            --header 'Circle-Token: ${CIRCLECI_TOKEN}' \
+            --header 'Content-Type: application/json' \
+            --data '{"branch": "circleci"}'
 
         env:
-          CIRCLECI_WEBHOOK_URL: ${{ secrets.CIRCLECI_WEBHOOK_URL }}
+          CIRCLECI_TOKEN: ${{ secrets.CIRCLECI_TOKEN }}
