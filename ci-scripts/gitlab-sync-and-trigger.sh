@@ -18,6 +18,7 @@ echo "ERROR_VAR is $ERROR_VAR"
 
 if [[  "$ERROR_VAR" != "*error:*" ]]; then
     echo "Triggering Gitlab pipeline on tag push..."
+    echo " Latest Tag is : $LATEST_TAG and pushing it to ref"
     curl -X POST \
         -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
         -H "Content-Type: application/json" \
