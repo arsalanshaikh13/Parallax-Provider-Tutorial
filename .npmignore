@@ -1,0 +1,13 @@
+coverage/
+test/
+project/
+.gitignore
+.prettierignore
+.editorconfig
+.git*
+.*rc
+*.config.*js
+.travis.yml
+.ci_build.yml
+.github
+node_modules

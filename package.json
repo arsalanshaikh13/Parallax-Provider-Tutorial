@@ -1,7 +1,9 @@
 {
-  "name": "parallaxturtlelib",
+  "name": "parallaxturtlelibcircle",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/parallax-provider.cjs.js",
+  "module": "dist/parallax-provider.esm.js",
+  "browser": "dist/parallax-provider.umd.js",
   "license": "MIT",
   "scripts": {
     "build": " yarn clean && rollup -c",

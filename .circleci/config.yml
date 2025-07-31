@@ -5,6 +5,11 @@ executors:
     docker:
       - image: cimg/node:18.20
 
+anchors:
+  tag_filter: &tag_filter
+    tags:
+      only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
+
 jobs:
   install:
     executor: node_executor
@@ -68,6 +73,7 @@ workflows:
             branches:
               only:
                 - circleci
+            <<: *tag_filter
       - build:
           requires:
             - lint_and_test
@@ -75,14 +81,13 @@ workflows:
             branches:
               only:
                 - circleci
+            <<: *tag_filter
 
       - publish:
           requires:
             - build
 
           filters:
-            tags:
-              only: /^v[0-9]+.*$/
-
+            <<: *tag_filter
             branches:
               ignore: /.*/

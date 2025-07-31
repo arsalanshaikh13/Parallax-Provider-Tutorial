@@ -1,21 +1,37 @@
 # https://support.circleci.com/hc/en-us/articles/360050351292-How-to-Trigger-a-Workflow-via-CircleCI-API-v2
 # https://circleci.com/docs/triggers-overview/#trigger-a-pipeline-from-a-custom-webhook
-name: Trigger CircleCI
+name: Trigger CircleCI from GitHub
 
 on:
   push:
     branches:
       - circleci
+    tags:
+      - 'v*-circleci.*'
+
 jobs:
   trigger-circleci:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger CircleCI pipeline
         run: |
-          curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
-            --header "Circle-Token: ${CIRCLECI_TOKEN}" \
-            --header "Content-Type: application/json" \
-            --data '{"branch": "circleci"}'
+          echo "GitHub Ref: $GITHUB_REF"
+          echo "GitHub Ref Type: $GITHUB_REF_TYPE"
 
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+            echo "Triggering CircleCI on tag: $TAG_NAME"
+            curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
+              --header "Circle-Token: $CIRCLECI_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data "{\"tag\": \"${TAG_NAME}\"}"
+          else
+            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+            echo "Triggering CircleCI on branch: $BRANCH_NAME"
+            curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
+              --header "Circle-Token: $CIRCLECI_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data "{\"branch\": \"${BRANCH_NAME}\"}"
+          fi
         env:
           CIRCLECI_TOKEN: ${{ secrets.CIRCLECI_TOKEN }}
