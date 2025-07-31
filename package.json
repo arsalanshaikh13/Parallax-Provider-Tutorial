@@ -1,6 +1,6 @@
 {
   "name": "parallaxturtlelib",
-  "version": "1.0.1-gitlabci.0",
+  "version": "1.0.1-gitlabci.1",
   "main": "dist/parallax-provider.cjs.js",
   "module": "dist/parallax-provider.esm.js",
   "browser": "dist/parallax-provider.umd.js",
