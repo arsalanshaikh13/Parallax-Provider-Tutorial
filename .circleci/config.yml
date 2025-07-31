@@ -8,7 +8,7 @@ executors:
 anchors:
   tag_filter: &tag_filter
     tags:
-      only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
+      only: /^v\\d+\\.\\d+\\.\\d+-circleci\\.\\d+$/
 
 jobs:
   install:
