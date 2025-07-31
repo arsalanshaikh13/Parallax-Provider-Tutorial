@@ -41,8 +41,8 @@ build:
 release:
   stage: release
   script:
-    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
-    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
     - echo "Publishing version -> $(node -p
       "require('./package.json').version")" # print package version before publishing
     - npm publish --dry-run
