@@ -4,6 +4,14 @@ cache:
   paths:
     - node_modules/
 
+workflow:
+  rules:
+    - if:
+        '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
+        $CI_PIPELINE_SOURCE == "api"'
+      when: always
+    - when: never
+
 default:
   before_script:
     - corepack disable # prevent auto Yarn v4 activation
@@ -21,28 +29,22 @@ lint_and_test:
     - yarn lint
     - yarn test
 
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "gitlabci" && $CI_PIPELINE_SOURCE == "api"'
-      when: always
-
 build:
   stage: build
   script:
     - yarn build
+    - echo 'CI_COMMIT_TAG value -> "$CI_COMMIT_TAG"'
   artifacts:
     paths:
       - dist/
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "gitlabci" && $CI_PIPELINE_SOURCE == "api"'
-      when: always
 
 release:
   stage: release
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - echo "Publishing version -> $(node -p
+      "require('./package.json').version")" # print package version before publishing
     - npm publish
   rules:
-    - if:
-        '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]-gitlabci\.[0-9]+$/ &&
-        $CI_PIPELINE_SOURCE == "api"'
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]-gitlabci\.[0-9]+$/'
       when: always

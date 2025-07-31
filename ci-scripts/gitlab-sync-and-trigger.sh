@@ -13,10 +13,21 @@ echo "Force pushing latest commit GitHub code to GitLab..."
 git push --force  gitlab HEAD:${GITLAB_BRANCH}
 
 
-
 echo " Triggering Gitlab pipeline..."
 curl -X POST \
     -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
     -H "Content-Type: application/json" \
     -d "{\"ref\":\"${GITLAB_BRANCH}\"}" \
     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+
+LATEST_TAG=$(git describe --tags 2>/dev/null || echo "")
+if [ -n "$LATEST_TAG" ]; then
+    echo " Latest Tag is : $LATEST_TAG"
+    curl -X POST \
+        -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
+        -H "Content-Type: application/json" \
+        -d "{\"ref\":\"${LATEST_TAG}\"}" \
+        "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+else
+    echo "No tags found"
+fi
