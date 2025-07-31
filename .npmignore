@@ -3,6 +3,8 @@ test/
 ci-scripts/
 project/
 .gitignore
+.prettierignore
+.editorconfig
 .git
 .*rc
 *.config.*js
