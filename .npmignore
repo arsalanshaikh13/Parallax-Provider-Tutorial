@@ -5,7 +5,7 @@ project/
 .gitignore
 .prettierignore
 .editorconfig
-.git
+.git*
 .*rc
 *.config.*js
 .travis.yml
