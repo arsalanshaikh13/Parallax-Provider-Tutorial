@@ -12,9 +12,11 @@ git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalansha
 LATEST_TAG=$(git describe --tags 2>/dev/null || echo "")
 echo " Latest Tag is : $LATEST_TAG and pushing it to gitlab"
 
+set +e # do not exit immediately on error below
 echo "Triggering Gitlab pipeline..."
 ERROR_VAR=$(git push  gitlab $LATEST_TAG 2>&1)
 echo "ERROR_VAR is $ERROR_VAR"
+set -e # if there is any error in below lines exit immediately
 
 if [[  "$ERROR_VAR" != "*error:*" ]]; then
     echo "Push succeeded"
