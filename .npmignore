@@ -1,0 +1,12 @@
+coverage/
+test/
+ci-scripts/
+project/
+.gitignore
+.git
+.*rc
+*.config.*js
+.travis.yml
+.ci_build.yml
+.github
+node_modules
