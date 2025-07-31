@@ -9,15 +9,14 @@ echo "Adding Gitlab remote"
 git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
 
 
-
-
-
+LATEST_TAG=$(git describe --tags 2>/dev/null || echo "")
+echo " Latest Tag is : $LATEST_TAG and pushing it to gitlab"
 
 echo "Triggering Gitlab pipeline..."
-LATEST_TAG=$(git describe --tags 2>/dev/null || echo "")
-if [ -n "$LATEST_TAG" ]; then
-    echo " Latest Tag is : $LATEST_TAG and pushing it to gitlab"
-    git push --force gitlab $LATEST_TAG
+ERROR_VAR=$(git push  gitlab $LATEST_TAG 2>&1)
+echo "ERROR_VAR is $ERROR_VAR"
+
+if [[  "$ERROR_VAR" != "*error:*" ]]; then
     echo "Triggering Gitlab pipeline on tag push..."
     curl -X POST \
         -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
