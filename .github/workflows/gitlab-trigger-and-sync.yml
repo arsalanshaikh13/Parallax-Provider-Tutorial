@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - gitlabci # or your branch
+    tags:
+      - 'v*-gitlabci.*'
 
 jobs:
   trigger:
