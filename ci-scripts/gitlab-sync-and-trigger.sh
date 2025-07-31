@@ -10,7 +10,7 @@ git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalansha
 
 
 echo "Force pushing latest commit GitHub code to GitLab..."
-git push --force gitlab HEAD:${GITLAB_BRANCH}
+git push  gitlab HEAD:${GITLAB_BRANCH}
 
 
 
