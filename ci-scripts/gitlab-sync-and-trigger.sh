@@ -16,9 +16,11 @@ set +e # do not exit immediately on error below
 echo "Triggering Gitlab pipeline..."
 ERROR_VAR=$(git push  gitlab $LATEST_TAG 2>&1)
 echo "ERROR_VAR is $ERROR_VAR"
+EXIT_CODE=$?
+echo "exit code is $EXIT_CODE"
 set -e # if there is any error in below lines exit immediately
 
-if [[  "$ERROR_VAR" != "*error:*" ]]; then
+if [[  "$ERROR_VAR" != *"error:"* ]]; then
     echo "Push succeeded"
     echo "Waiting for GitLab to register the tag..."
     sleep 5
