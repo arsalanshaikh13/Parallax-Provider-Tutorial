@@ -1,17 +1,12 @@
 version: 2.1
 
+# Define reusable executor
 executors:
   node_executor:
     docker:
       - image: cimg/node:18.20
 
-anchors:
-  tag_filter: &tag_filter
-    tags:
-      only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
-  branch_filter: &branch_filter
-    branches:
-      only: circleci
+# Define all the jobs
 jobs:
   install:
     executor: node_executor
@@ -60,32 +55,42 @@ jobs:
       - run:
           name: Authenticate with npm
           command: |
+            # Use the NPM_TOKEN environment variable for authentication
             echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run: npm publish
 
+# Consolidate workflows into a single, filtered workflow
 workflows:
-  version: 2
-  build_test_publish:
+  version: 2.1
+  build_and_release:
     jobs:
-      - install
+      - install:
+          filters:
+            branches:
+              only: circleci
+            tags:
+              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
       - lint_and_test:
           requires:
             - install
           filters:
-            <<: *branch_filter
-            <<: *tag_filter
+            branches:
+              only: circleci
+            tags:
+              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
       - build:
           requires:
             - lint_and_test
           filters:
-            <<: *branch_filter
-            <<: *tag_filter
-
+            branches:
+              only: circleci
+            tags:
+              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
       - publish:
           requires:
             - build
-
           filters:
-            <<: *tag_filter
             branches:
-              ignore: /.*/
+              ignore: /.*/ # Ignore all branches
+            tags:
+              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
