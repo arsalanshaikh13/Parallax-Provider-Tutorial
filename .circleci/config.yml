@@ -1,34 +1,91 @@
 version: 2.1
 
-# This is a minimal debug configuration to find the exact git tag value.
-# After you find the value, you can use it to fix your regex.
-
 executors:
-  # A simple executor is all we need for a single echo command.
   node_executor:
     docker:
       - image: cimg/node:18.20
 
+anchors:
+  tag_filter: &tag_filter
+    tags:
+      only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
+  branch_filter: &branch_filter
+    branches:
+      only: circleci
 jobs:
-  print_tag_name:
+  install:
     executor: node_executor
     steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-deps-{{ checksum "yarn.lock" }}
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: yarn-deps-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+
+  lint_and_test:
+    executor: node_executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: yarn lint
+      - run: yarn test
+
+  build:
+    executor: node_executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: yarn build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  publish:
+    executor: node_executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
       - run:
-          name: Print the exact git tag value
-          # This command will output the value of the pipeline parameter.
-          # The output will be in the format 'CircleCI Pipeline Tag: <your_tag_name>'.
+          name: Authenticate with npm
           command: |
-            echo "CircleCI Pipeline Tag: << pipeline.git.tag >>"
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run: npm publish
 
 workflows:
-  version: 2.1
-  # This workflow is configured to run for ANY tag push.
-  # The `only: /.*/` regex ensures it always triggers on a tag.
-  debug_tag_workflow:
+  version: 2
+  build_test_publish:
     jobs:
-      - print_tag_name:
+      - install
+      - lint_and_test:
+          requires:
+            - install
           filters:
+            <<: *branch_filter
+            <<: *tag_filter
+      - build:
+          requires:
+            - lint_and_test
+          filters:
+            <<: *branch_filter
+            <<: *tag_filter
+
+      - publish:
+          requires:
+            - build
+
+          filters:
+            <<: *tag_filter
             branches:
-              ignore: /.*/ # Ignore all branches
-            tags:
-              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Run for any tag
+              ignore: /.*/
