@@ -33,6 +33,7 @@ if [[  "$ERROR_VAR" != *"error:"* ]]; then
         -d "{\"ref\":\"$LATEST_TAG\"}" \
         "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
 elif ["$GITHUB_REF_TYPE" == "tag"]
+    echo "found existing tag"
     exit 1
 else
     echo "No tags found"
