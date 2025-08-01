@@ -9,7 +9,9 @@ anchors:
   tag_filter: &tag_filter
     tags:
       only: /^v\\d+\\.\\d+\\.\\d+-circleci\\.\\d+$/
-
+  branch_filter: &branch_filter
+    branches:
+      only: circleci
 jobs:
   install:
     executor: node_executor
@@ -70,17 +72,13 @@ workflows:
           requires:
             - install
           filters:
-            branches:
-              only:
-                - circleci
+            <<: *branch_filter
             <<: *tag_filter
       - build:
           requires:
             - lint_and_test
           filters:
-            branches:
-              only:
-                - circleci
+            <<: *branch_filter
             <<: *tag_filter
 
       - publish:
