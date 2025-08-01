@@ -7,6 +7,9 @@ module.exports = {
     filename: 'bundle.js',
     // publicPath: "/", // required for dev server routing
   },
+  resolve: {
+    extensions: ['.mjs', '.js', '.json'],
+  },
   mode: 'development',
   devServer: {
     static: {
