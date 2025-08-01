@@ -6,6 +6,17 @@ executors:
     docker:
       - image: cimg/node:18.20
 
+anchors:
+  tag_filter: &tag_filter
+    tags:
+      only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
+  branch_filter: &branch_filter
+    branches:
+      only: circleci
+
+      <<: *branch_filter
+      <<: *tag_filter
+
 # Define all the jobs
 jobs:
   install:
@@ -66,31 +77,24 @@ workflows:
     jobs:
       - install:
           filters:
-            branches:
-              only: circleci
-            tags:
-              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
+            <<: *branch_filter
+            <<: *tag_filter
       - lint_and_test:
           requires:
             - install
           filters:
-            branches:
-              only: circleci
-            tags:
-              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
+            <<: *branch_filter
+            <<: *tag_filter
       - build:
           requires:
             - lint_and_test
           filters:
-            branches:
-              only: circleci
-            tags:
-              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
+            b<<: *branch_filter
+            <<: *tag_filter
       - publish:
           requires:
             - build
           filters:
             branches:
               ignore: /.*/ # Ignore all branches
-            tags:
-              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
+            <<: *tag_filter
