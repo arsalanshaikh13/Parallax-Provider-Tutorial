@@ -31,4 +31,4 @@ workflows:
             branches:
               ignore: /.*/ # Ignore all branches
             tags:
-              only: /.*/ # Run for any tag
+              only: /^v\\d+\\.\\d+\\.\\d+-circleci\\.\\d+$/ # Run for any tag
