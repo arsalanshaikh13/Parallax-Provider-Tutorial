@@ -34,6 +34,8 @@ build:
   script:
     - yarn build
     - echo 'CI_COMMIT_TAG value -> "$CI_COMMIT_TAG"'
+  needs:
+    - test
   artifacts:
     paths:
       - dist/
@@ -45,6 +47,8 @@ release:
     - echo "Publishing version -> $(node -p
       "require('./package.json').version")" # print package version before publishing
     - npm publish
+  needs:
+    - build
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]-gitlabci\.[0-9]+$/'
       when: always
