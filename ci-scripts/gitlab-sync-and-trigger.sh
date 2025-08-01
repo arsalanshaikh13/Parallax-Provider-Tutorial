@@ -32,6 +32,8 @@ if [[  "$ERROR_VAR" != *"error:"* ]]; then
         -H "Content-Type: application/json" \
         -d "{\"ref\":\"$LATEST_TAG\"}" \
         "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+elif ["$GITHUB_REF_TYPE" == "tag"]
+    exit 1
 else
     echo "No tags found"
     echo "Force pushing latest commit GitHub code to GitLab..."
