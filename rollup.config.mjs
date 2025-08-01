@@ -53,7 +53,7 @@ export default {
     {
       name: LIB_NAME,
       file: 'dist/parallax-provider.esm.js',
-      format: 'es',
+      format: 'esm',
     },
   ],
   plugins: [
