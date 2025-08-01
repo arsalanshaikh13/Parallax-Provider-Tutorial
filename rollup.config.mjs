@@ -52,7 +52,7 @@ export default {
     },
     {
       name: LIB_NAME,
-      file: 'dist/parallax-provider.es.js',
+      file: 'dist/parallax-provider.esm.js',
       format: 'es',
     },
   ],
