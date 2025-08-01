@@ -14,9 +14,6 @@ anchors:
     branches:
       only: circleci
 
-      <<: *branch_filter
-      <<: *tag_filter
-
 # Define all the jobs
 jobs:
   install:
@@ -89,7 +86,7 @@ workflows:
           requires:
             - lint_and_test
           filters:
-            b<<: *branch_filter
+            <<: *branch_filter
             <<: *tag_filter
       - publish:
           requires:
