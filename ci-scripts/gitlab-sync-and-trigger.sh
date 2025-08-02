@@ -4,12 +4,12 @@ set -e
 
 echo "Adding Gitlab remote"
 echo "$GITHUB_REF_TYPE  is github_ref_type and $GITHUB_REF  is github_Ref and ${GITHUB_REF#refs/tags/}"
-echo "${{ github.ref }} and ${{github.ref_type}}
+
 git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
 
 
 
-if [["$GITHUB_REF_TYPE" == "tag"]]; then
+if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
     echo "tag found"
     echo "Waiting for GitLab to register the tag..."
     LATEST_TAG="${GITHUB_REF#refs/tags/}"
