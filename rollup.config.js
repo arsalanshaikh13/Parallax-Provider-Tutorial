@@ -38,7 +38,7 @@ import rollupBabel from '@rollup/plugin-babel';
 const LIB_NAME = 'ParallaxProvider';
 
 export default {
-  input: 'src/index.js',
+  input: 'src/index.mjs',
   output: [
     {
       name: LIB_NAME,
