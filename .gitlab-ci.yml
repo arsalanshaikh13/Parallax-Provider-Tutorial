@@ -1,3 +1,6 @@
+# docker image to use for all jobs
+image: node:18-alpine
+
 # set workflow rules for all the stages, exit the workflow if rules don't match
 workflow:
   rules:
@@ -14,8 +17,6 @@ workflow:
     - when: never # do not run pipeline on any other condition
 
 default:
-  # docker image to use for all jobs
-  image: node:18-alpine
   # global cache for node_modules directory
   # cache key is based on yarn.lock file.
   # this ensures cache is only recreated if a dependency is added,updated, or removed
