@@ -28,7 +28,6 @@ jobs:
       #updated: install git and yarn. Alpine based images are very minimal and
       # may not have git or yarn pre-installed
       - run: apk add --no-cache git
-      - run: npm install -g yarn@1.22.22
       - run: yarn install
       - save_cache:
           paths:
