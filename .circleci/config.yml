@@ -4,7 +4,9 @@ version: 2.1
 executors:
   node_executor:
     docker:
-      - image: cimg/node:18.20
+      # - image: cimg/node:18.20
+      # updated: using the lightweight 'node:18-alpine' image for faster download in ci setup and faster pipelines
+      - image: node:18-alpine
 
 anchors:
   tag_filter: &tag_filter
@@ -23,6 +25,10 @@ jobs:
       - restore_cache:
           keys:
             - yarn-deps-{{ checksum "yarn.lock" }}
+      #updated: install git and yarn. Alpine based images are very minimal and
+      # may not have git or yarn pre-installed
+      - run: apk add --no-cache git
+      - run: npm install -g yarn@1.22.22
       - run: yarn install
       - save_cache:
           paths:
