@@ -1,18 +1,33 @@
-image: node:18-alpine
-
-cache:
-  paths:
-    - node_modules/
-
+# set workflow rules for all the stages, exit the workflow if rules don't match
 workflow:
   rules:
+    - changes:
+        - '**.js'
+        - '**.json'
+        - '**.*rc'
+        - '**.yml'
+    # run pipeline on branch push, tag push and only through api source
     - if:
         '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
         $CI_PIPELINE_SOURCE == "api"'
       when: always
-    - when: never
+    - when: never # do not run pipeline on any other condition
 
 default:
+  # docker image to use for all jobs
+  image: node:18-alpine
+  # global cache for node_modules directory
+  # cache key is based on yarn.lock file.
+  # this ensures cache is only recreated if a dependency is added,updated, or removed
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules/
+
+  # run yarn install automatically at start of every job,
+  # the cache will make this process nearly instantaneous after the first run
   before_script:
     # - corepack disable # prevent auto Yarn v4 activation
     # npm install is not need since installed yarn version in node:18-alpine is 1.22.22
@@ -34,12 +49,14 @@ build:
   stage: build
   script:
     - yarn build
-    - echo 'CI_COMMIT_TAG value -> "$CI_COMMIT_TAG"'
   needs:
     - lint_and_test
+
+  # save the build artifacts ('dist' folder) so they can pass to the publish stage
   artifacts:
     paths:
       - dist/
+    expire_in: 1 week
 
 release:
   stage: release
