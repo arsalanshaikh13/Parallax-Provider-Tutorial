@@ -14,8 +14,9 @@ workflow:
 
 default:
   before_script:
-    - corepack disable # prevent auto Yarn v4 activation
-    - npm install -g yarn@1.22.22
+    # - corepack disable # prevent auto Yarn v4 activation
+    # npm install is not need since installed yarn version in node:18-alpine is 1.22.22
+    # - npm install -g yarn@1.22.22
     - yarn install
 
 stages:
