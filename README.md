@@ -1,0 +1,1 @@
+[![Build, Test and Publish](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/actions/workflows/ci.yml/badge.svg)](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/actions/workflows/ci.yml)
