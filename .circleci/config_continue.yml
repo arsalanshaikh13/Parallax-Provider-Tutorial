@@ -81,6 +81,7 @@ jobs:
 # Consolidate workflows into a single, filtered workflow
 workflows:
   version: 2.1
+  when: << pipeline.parameters.run-build-and-release >>
   build_and_release:
     jobs:
       - install:
