@@ -1,6 +1,6 @@
 {
   "name": "parallax-provider-tutorial-library",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "dist/parallax-provider.cjs.js",
   "module": "dist/parallax-provider.esm.js",
   "exports": {
