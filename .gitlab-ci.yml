@@ -2,25 +2,21 @@
 image: node:18-alpine
 
 # set workflow rules for all the stages, exit the workflow if rules don't match
-workflow:
+.default-rules: &default-rules
   rules:
     # run pipeline on branch push, tag push and only through api source
     # and avoid double pipeline trigger one through api source and other through gitlab username source
     - if:
         '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
         $CI_PIPELINE_SOURCE == "api"'
-      when: always
-    - when: never # do not run pipeline on any other condition
-# Anchor: check for changes in the file extension to run the pipeline
-.file-rules: &file-rules
-  rules:
-    - changes:
+      # check for changes in the file extension to run the pipeline
+      changes:
         - '**.js'
         - '**.json'
         - '**.*rc'
         - '**.yml'
       when: always
-    - when: never # do not run if file extension don'
+    - when: never # do not run pipeline on any other condition
 
 default:
   # global cache for node_modules directory
@@ -48,14 +44,14 @@ stages:
 
 lint_and_test:
   stage: test
-  <<: *file-rules
+  <<: *default-rules
   script:
     - yarn lint
     - yarn test
 
 build:
   stage: build
-  <<: *file-rules
+  <<: *default-rules
   script:
     - yarn build
   needs:
@@ -74,6 +70,8 @@ release:
     - echo "Publishing version -> $(node -p
       "require('./package.json').version")" # print package version before publishing
     - npm publish
+    # since publish needs build stage to happen anyway so no need to put the anchor here
+    # it will only run if build successfully happens
   needs:
     - build
   rules:
