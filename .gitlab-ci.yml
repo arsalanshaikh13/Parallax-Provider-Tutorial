@@ -15,7 +15,6 @@ image: node:18-alpine
         - '**.json'
         - '**.*rc'
         - '**.yml'
-      when: on_success
     - when: never # do not run pipeline on any other condition
 
 default:
@@ -56,7 +55,6 @@ lint_and_test:
         - '**.json'
         - '**.*rc'
         - '**.yml'
-      when: on_success
     - when: never # do not run pipeline on any other condition
   script:
     - yarn lint
@@ -76,7 +74,6 @@ build:
         - '**.json'
         - '**.*rc'
         - '**.yml'
-      when: on_success
     - when: never # do not run pipeline on any other condition
   script:
     - yarn build
