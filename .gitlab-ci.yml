@@ -9,14 +9,18 @@ workflow:
     - if:
         '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
         $CI_PIPELINE_SOURCE == "api"'
-      # and also check for changes in the file extension to run the pipeline and in
-      changes:
+      when: always
+    - when: never # do not run pipeline on any other condition
+# Anchor: check for changes in the file extension to run the pipeline
+.file-rules: &file-rules
+  rules:
+    - changes:
         - '**.js'
         - '**.json'
         - '**.*rc'
         - '**.yml'
       when: always
-    - when: never # do not run pipeline on any other condition
+    - when: never # do not run if file extension don'
 
 default:
   # global cache for node_modules directory
@@ -44,12 +48,14 @@ stages:
 
 lint_and_test:
   stage: test
+  <<: *file-rules
   script:
     - yarn lint
     - yarn test
 
 build:
   stage: build
+  <<: *file-rules
   script:
     - yarn build
   needs:
