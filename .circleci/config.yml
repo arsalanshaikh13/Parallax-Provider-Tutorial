@@ -6,7 +6,7 @@ setup: true
 
 # Use the path-filtering orb to check for changed files
 orbs:
-  path-filtering: circleci/path-filtering@1.0.0
+  path-filtering: circleci/path-filtering@2.0.2
 
 # the setup workflow that runs first on everypipeline
 workflows:
