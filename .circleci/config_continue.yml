@@ -82,8 +82,7 @@ jobs:
 workflows:
   version: 2.1
   build_and_release:
-    when:
-      condition: << pipeline.parameters.run-build-and-release >>
+    when: << pipeline.parameters.run-build-and-release >>
     jobs:
       - install:
           filters:
