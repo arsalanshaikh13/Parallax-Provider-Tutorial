@@ -44,14 +44,40 @@ stages:
 
 lint_and_test:
   stage: test
-  <<: *default-rules
+  rules:
+    # run pipeline on branch push, tag push and only through api source
+    # and avoid double pipeline trigger one through api source and other through gitlab username source
+    - if:
+        '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
+        $CI_PIPELINE_SOURCE == "api"'
+      # check for changes in the file extension to run the pipeline
+      changes:
+        - '**.js'
+        - '**.json'
+        - '**.*rc'
+        - '**.yml'
+      when: always
+    - when: never # do not run pipeline on any other condition
   script:
     - yarn lint
     - yarn test
 
 build:
   stage: build
-  <<: *default-rules
+  rules:
+    # run pipeline on branch push, tag push and only through api source
+    # and avoid double pipeline trigger one through api source and other through gitlab username source
+    - if:
+        '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
+        $CI_PIPELINE_SOURCE == "api"'
+      # check for changes in the file extension to run the pipeline
+      changes:
+        - '**.js'
+        - '**.json'
+        - '**.*rc'
+        - '**.yml'
+      when: always
+    - when: never # do not run pipeline on any other condition
   script:
     - yarn build
   needs:
