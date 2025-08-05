@@ -13,14 +13,14 @@ if [ -z "$CHANGED" ]; then
     echo "No relevant changes found. Generating empty pipeline."
     cat  > .gitlab/pipeline-config.yml <<EOF
 include:
-  - local: '.gitlab/child-empty.yml'
+  - local: '.gitlab/ci-empty.yml'
 EOF
         echo "Reached end of condition block"
 else
     echo "Found relevant changes: $CHANGED"
     cat > .gitlab/pipeline-config.yml <<EOF
 include:
-  - local: '.gitlab/child-full.yml'
+  - local: '.gitlab/ci-full.yml'
 EOF
     echo "Reached end of condition block"
 fi
