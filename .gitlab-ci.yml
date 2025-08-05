@@ -37,35 +37,34 @@ default:
   #   - yarn install
 
 stages:
-  - check
   - test
   - build
   - release
 
-# This job explicitly checks for file changes and fails if none found
-check_for_relevant_files:
-  stage: check
-  script:
-    - apk add --no-cache git # since we are using git command in the script so install git here
-    - |
-      set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
+# # This job explicitly checks for file changes and fails if none found
+# check_for_relevant_files:
+#   stage: check
+#   script:
+#     - apk add --no-cache git # since we are using git command in the script so install git here
+#     - |
+#       set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
 
-      if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
-          ! git rev-parse "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
+#       if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
+#           ! git rev-parse "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
 
-          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
-      else
-          CHANGED=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
-      fi
-      if [ -z "$CHANGED" ]; then
-        echo "No relevant changes found. Stopping pipeline."
-        exit 1
-      fi
-      echo "Found relevant changes: $CHANGED"
+#           CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
+#       else
+#           CHANGED=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
+#       fi
+#       if [ -z "$CHANGED" ]; then
+#         echo "No relevant changes found. Stopping pipeline."
+#         exit 1
+#       fi
+#       echo "Found relevant changes: $CHANGED"
 lint_and_test:
   stage: test
-  needs:
-    - check_for_relevant_files
+  # needs:
+  #   - check_for_relevant_files
   script:
     - yarn install
     - yarn lint
