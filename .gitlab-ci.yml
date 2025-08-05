@@ -39,17 +39,17 @@ check_for_relevant_files:
       fi
       echo "output of diff: $CHANGED "
       if [ -z "$CHANGED" ]; then
-        echo "No relevant changes found. Generating empty pipeline."
-        cat <<EOF > .gitlab/pipeline-config.yml
-        include:
-          - local: '.gitlab/child-empty.yml'
-        EOF
+          echo "No relevant changes found. Generating empty pipeline."
+          cat <<EOF > .gitlab/pipeline-config.yml
+          include:
+            - local: '.gitlab/child-empty.yml'
+          EOF
       else
-        echo "Found relevant changes: $CHANGED"
-        cat <<EOF > .gitlab/pipeline-config.yml
-        include:
-          - local: '.gitlab/child-full.yml'
-        EOF
+          echo "Found relevant changes: $CHANGED"
+          cat <<EOF > .gitlab/pipeline-config.yml
+          include:
+            - local: '.gitlab/child-full.yml'
+          EOF
       fi
   # using artifacts:reports:dotenv to pass environment variable to the subsequent job as signal to start or stop subsequent jobs
   artifacts:
