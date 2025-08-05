@@ -25,17 +25,15 @@ stages:
 check_for_relevant_files:
   stage: check
   script:
-    - echo "Listing root directory:"
+    - apk add --no-cache git # since we are using git command in the script so install git here
     - pwd
-    - ls -l
+    - echo "Listing root directory:"
+    - ls -la
     - echo "Listing .gitlab directory:"
     - ls -l .gitlab || echo ".gitlab folder not found"
     - echo "Listing .gitlab/ directory:"
-    - ls -l ./gitlab || echo "./gitlab folder not found"
-    - echo "Listing ./gitlab/ directory:"
-    - apk add --no-cache git # since we are using git command in the script so install git here
     - chmod +x .gitlab/generate-pipeline.sh
-    - .gitlab/generate-pipeline.sh
+    - sh .gitlab/generate-pipeline.sh
   # using artifacts:reports:dotenv to pass environment variable to the subsequent job as signal to start or stop subsequent jobs
   artifacts:
     paths:

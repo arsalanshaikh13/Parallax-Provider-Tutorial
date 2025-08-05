@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
 # initalize the bool variable
 if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
