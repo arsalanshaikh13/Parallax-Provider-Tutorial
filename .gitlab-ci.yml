@@ -62,7 +62,8 @@ check_for_changes:
       echo "Found relevant changes: $CHANGED"
 lint_and_test:
   stage: test
-  needs: check
+  needs:
+    - check_for_changes
   rules:
     # run pipeline on branch push, tag push and only through api source
     # and avoid double pipeline trigger one through api source and other through gitlab username source
