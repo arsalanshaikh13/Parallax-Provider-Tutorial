@@ -18,8 +18,6 @@ stages:
 
 lint_and_test:
   stage: test
-  needs:
-    - check_for_relevant_files
   script:
     - echo "This was triggered by $CI_PIPELINE_SOURCE"
     - yarn install
@@ -30,10 +28,6 @@ build:
   stage: build
   needs:
     - lint_and_test
-  rules:
-    - if: '$HAS_RELEVANT_FILE_CHANGES == "true"'
-      when: on_success
-    - when: never
   script:
     - yarn install
     - yarn build
