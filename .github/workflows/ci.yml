@@ -4,25 +4,47 @@ on:
   push:
     branches:
       - main
-      # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
-      # paths and branches work together
-      # this filter ensures pipeline will run only on changes to this files only
-      # ignoring changes to readme,coverage files or even empty commits
-    paths:
-      - '**.js'
-      - '**.json'
-      - '**.*rc'
-      - '**.yml'
       # git does not take regex patterns but takes glob patterns
       # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#filter-pattern-cheat-sheet
     tags:
       - 'v[0-9].[0-9]+.[0-9]+' # Trigger release when pushing tags like v1.0.0
 
 jobs:
+  filter-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      # https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax#outputs-for-docker-container-and-javascript-actions
+      has_relevant_changes: ${{ steps.check-changes.outputs.has_changes }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # We need a full history to compare commits correctly
+          fetch-depth: 0
+
+      - name: Check for relevant file changes
+        id: check-changes
+        run: |
+          # Use git diff to find changes between the previous commit and the current one.
+          # The grep command filters for the file extensions you specified.
+          # The result is saved as a step output, which can be used in other jobs.
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.js$|\.json$|\.yml\.lock$|\..*rc$' || true)
+
+          if [ -n "$changed_files" ]; then
+            echo "Relevant files have been changed."
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "No relevant files were changed. Skipping subsequent jobs."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
   build-and-test:
     name: Lint, Test, and Build
     runs-on: ubuntu-latest
-
+    # This job will only run if the 'filter-changes' job's output is 'true'.
+    # This is the key to skipping the entire job on empty commits.
+    needs: filter-changes
+    # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/pass-job-outputs
+    if: needs.filter-changes.outputs.has_relevant_changes == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
