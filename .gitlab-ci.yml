@@ -52,7 +52,7 @@ check_for_changes:
         $CI_PIPELINE_SOURCE == "api"
   script:
     - |
-      set -e  # Exit on any error
+      set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
       set -x  # Print commands as they execute
 
       git log --oneline -n 20
@@ -62,10 +62,10 @@ check_for_changes:
 
       if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
           ! git rev-parse "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
-          echo ""
-          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA" | grep -E '\.js$|\.json$|\.yml$|\..*rc$')
+
+          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
       else
-          CHANGED=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" | grep -E '\.js$|\.json$|\.yml$|\..*rc$')
+          CHANGED=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
       fi
       if [ -z "$CHANGED" ]; then
         echo "No relevant changes found. Stopping pipeline."
