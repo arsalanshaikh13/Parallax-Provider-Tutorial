@@ -59,9 +59,14 @@ check_for_changes:
       echo "CI_COMMIT_SHA: $CI_COMMIT_SHA"
       echo "CI_COMMIT_BEFORE_SHA: $CI_COMMIT_BEFORE_SHA"
       git rev-parse $CI_COMMIT_BEFORE_SHA || echo "Before SHA not found!"
-      SHOW=$(git show --name-only $CI_COMMIT_SHA | grep -E '\.js$|\.json$|\.yml$|\..*rc$')
-      echo "$SHOW this is  the diff"
-      CHANGED=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -E '\.js$|\.json$|\.yml$|\..*rc$')
+
+      if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
+          ! git rev-parse "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
+          echo ""
+          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA" | grep -E '\.js$|\.json$|\.yml$|\..*rc$')
+      else
+          CHANGED=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" | grep -E '\.js$|\.json$|\.yml$|\..*rc$')
+      fi
       if [ -z "$CHANGED" ]; then
         echo "No relevant changes found. Stopping pipeline."
         exit 1
