@@ -83,11 +83,13 @@ lint_and_test:
 
 build:
   stage: build
+  needs:
+    - lint_and_test
+  rules:
+    - if: '$HAS_RELEVANT_FILE_CHANGES == "true"'
   script:
     - yarn install
     - yarn build
-  needs:
-    - lint_and_test
 
   # save the build artifacts ('dist' folder) so they can pass to the publish stage
   artifacts:
