@@ -28,8 +28,8 @@ jobs:
           # Use git diff to find changes between the previous commit and the current one.
           # The grep command filters for the file extensions you specified.
           # The result is saved as a step output, which can be used in other jobs.
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.js$|\.json$|\.yml\.lock$|\..*rc$' || true)
-
+          changed_files=$(git diff --name-only  HEAD^ ${{ github.sha }} | grep -E '\.js$|\.json$|\.yml$|\.lock$|\..*rc$')
+          echo $changed_files output
           if [ -n "$changed_files" ]; then
             echo "Relevant files have been changed."
             echo "has_changes=true" >> $GITHUB_OUTPUT
