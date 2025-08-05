@@ -75,7 +75,7 @@ check_for_condition:
 lint_and_test:
   stage: test
   needs:
-    - check_for_changes
+    - check_for_condition
   script:
     - yarn install
     - yarn lint
