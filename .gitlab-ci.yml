@@ -49,7 +49,8 @@ check_for_relevant_files:
     - apk add --no-cache git # since we are using git command in the script so install git here
     - |
       set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
-
+      # initalize the bool variable
+      HAS_RELEVANT_FILE_CHANGES=true
       if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
           ! git cat-file -e "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
 
@@ -60,10 +61,10 @@ check_for_relevant_files:
       echo "output of diff: $CHANGED "
       if [ -z "$CHANGED" ]; then
         echo "No relevant changes found. Stopping pipeline."
-        echo "HAS_RELEVANT_FILE_CHANGES=false" >> report.env
+        HAS_RELEVANT_FILE_CHANGES=false 
       fi
       echo "Found relevant changes: $CHANGED"
-      echo "HAS_RELEVANT_FILE_CHANGES=true" >> report.env
+      echo "HAS_RELEVANT_FILE_CHANGES=$HAS_RELEVANT_FILE_CHANGES" >> report.env
   # using artifacts:reports:dotenv to pass environment variable to the subsequent job as signal to start or stop subsequent jobs
   artifacts:
     reports:
