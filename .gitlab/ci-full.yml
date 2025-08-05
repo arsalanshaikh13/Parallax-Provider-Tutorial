@@ -21,7 +21,7 @@ lint_and_test:
   needs:
     - check_for_relevant_files
   script:
-    - echo "This was triggered by: $CI_PIPELINE_SOURCE"
+    - echo "This was triggered by $CI_PIPELINE_SOURCE"
     - yarn install
     - yarn lint
     - yarn test
