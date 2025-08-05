@@ -26,33 +26,8 @@ check_for_relevant_files:
   stage: check
   script:
     - apk add --no-cache git # since we are using git command in the script so install git here
-    - |
-      set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
-      # initalize the bool variable
-      HAS_RELEVANT_FILE_CHANGES=true
-      if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
-          ! git cat-file -e "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
-
-          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA" 2>&1 | grep -E '\.js$|\.json$|\.yml$|\.lock$|\..*rc$' )
-      else
-          CHANGED=$(git diff --pretty="" --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" 2>&1  | grep -E '\.js$|\.json$|\.yml$|\.lock$|\..*rc$' )
-      fi
-      echo "output of diff: $CHANGED "
-      if [ -z "$CHANGED" ]; then
-        echo "No relevant changes found. Generating empty pipeline."
-        cat  > .gitlab/pipeline-config.yml <<EOF
-        include:
-          - local: '.gitlab/child-empty.yml'
-        EOF
-        echo "Reached end of condition block"
-      else
-        echo "Found relevant changes: $CHANGED"
-        cat > .gitlab/pipeline-config.yml <<EOF
-        include:
-          - local: '.gitlab/child-full.yml'
-        EOF
-        echo "Reached end of condition block"
-      fi
+    - chmod +x .gitlab/generate-pipeline.sh
+    - .gitlab/generate-pipeline.sh
   # using artifacts:reports:dotenv to pass environment variable to the subsequent job as signal to start or stop subsequent jobs
   artifacts:
     paths:
