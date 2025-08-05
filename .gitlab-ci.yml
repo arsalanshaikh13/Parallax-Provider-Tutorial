@@ -2,20 +2,20 @@
 image: node:18-alpine
 
 # set workflow rules for all the stages, exit the workflow if rules don't match
-# .default-rules: &default-rules
-#   rules:
-#     # run pipeline on branch push, tag push and only through api source
-#     # and avoid double pipeline trigger one through api source and other through gitlab username source
-#     - if:
-#         '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
-#         $CI_PIPELINE_SOURCE == "api"'
-#       # check for changes in the file extension to run the pipeline
-#       changes:
-#         - '**.js'
-#         - '**.json'
-#         - '**.*rc'
-#         - '**.yml'
-#     - when: never # do not run pipeline on any other condition
+workflow:
+  rules:
+    # run pipeline on branch push, tag push and only through api source
+    # and avoid double pipeline trigger one through api source and other through gitlab username source
+    - if:
+        '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
+        $CI_PIPELINE_SOURCE == "api"'
+      # check for changes in the file extension to run the pipeline
+      # changes:
+      #   - '**.js'
+      #   - '**.json'
+      #   - '**.*rc'
+      #   - '**.yml'
+    - when: never # do not run pipeline on any other condition
 
 default:
   # global cache for node_modules directory
@@ -43,22 +43,12 @@ stages:
   - release
 
 # This job explicitly checks for file changes and fails if none found
-check_for_condition:
+check_for_relevant_files:
   stage: check
-  rules:
-    - if: |
-        ($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
-        $CI_PIPELINE_SOURCE == "api"
   script:
     - apk add --no-cache git # since we are using git command in the script so install git here
     - |
       set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
-      # set -x  # Print commands as they execute
-
-      # git log --oneline -n 20
-      # echo "CI_COMMIT_SHA: $CI_COMMIT_SHA"
-      # echo "CI_COMMIT_BEFORE_SHA: $CI_COMMIT_BEFORE_SHA"
-      # git rev-parse $CI_COMMIT_BEFORE_SHA || echo "Before SHA not found!"
 
       if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
           ! git rev-parse "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
@@ -75,7 +65,7 @@ check_for_condition:
 lint_and_test:
   stage: test
   needs:
-    - check_for_condition
+    - check_for_relevant_files
   script:
     - yarn install
     - yarn lint
