@@ -1,0 +1,7 @@
+stages:
+  - skip
+
+skip_job:
+  stage: skip
+  script:
+    - echo "No relevant changes — skipping downstream jobs."

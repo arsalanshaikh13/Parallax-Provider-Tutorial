@@ -17,30 +17,9 @@ workflow:
       #   - '**.yml'
     - when: never # do not run pipeline on any other condition
 
-default:
-  # global cache for node_modules directory
-  # cache key is based on yarn.lock file.
-  # this ensures cache is only recreated if a dependency is added,updated, or removed
-  cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-      - node_modules/
-
-  # run yarn install automatically at start of every job,
-  # the cache will make this process nearly instantaneous after the first run
-  # before_script:
-  #   # - corepack disable # prevent auto Yarn v4 activation
-  #   # npm install is not need since installed yarn version in node:18-alpine is 1.22.22
-  #   # - npm install -g yarn@1.22.22
-  #   - yarn install
-
 stages:
   - check
-  - test
-  - build
-  - release
+  - trigger
 
 # This job explicitly checks for file changes and fails if none found
 check_for_relevant_files:
@@ -54,65 +33,29 @@ check_for_relevant_files:
       if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
           ! git cat-file -e "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
 
-          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA" 2>&1 | grep -E '\.js$|\.json$|\.yml$|\..*rc$' )
+          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA" 2>&1 | grep -E '\.js$|\.json$|\.yml$|\.lock$|\..*rc$' )
       else
-          CHANGED=$(git diff --pretty="" --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" 2>&1  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' )
+          CHANGED=$(git diff --pretty="" --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" 2>&1  | grep -E '\.js$|\.json$|\.yml$|\.lock$|\..*rc$' )
       fi
       echo "output of diff: $CHANGED "
       if [ -z "$CHANGED" ]; then
-        echo "No relevant changes found. Stopping pipeline."
-        HAS_RELEVANT_FILE_CHANGES=false 
+        echo "No relevant changes found. Generating empty pipeline."
+        echo "include:\n  - local: '.gitlab/child-empty.yml'" > .gitlab/pipeline-config.yml 
+      else
+        echo "Found relevant changes: $CHANGED"
+        echo "include:\n  - local: '.gitlab/child-full.yml'" > .gitlab/pipeline-config.yml
+
       fi
-      echo "Found relevant changes: $CHANGED"
-      echo "HAS_RELEVANT_FILE_CHANGES=$HAS_RELEVANT_FILE_CHANGES" >> report.env
   # using artifacts:reports:dotenv to pass environment variable to the subsequent job as signal to start or stop subsequent jobs
   artifacts:
-    reports:
-      dotenv: report.env
-    expire_in: 10 minutes
-
-lint_and_test:
-  stage: test
-  needs:
-    - check_for_relevant_files
-  rules:
-    - if: '$HAS_RELEVANT_FILE_CHANGES == "true"'
-      when: on_success
-    - when: never
-  script:
-    - yarn install
-    - yarn lint
-    - yarn test
-
-build:
-  stage: build
-  needs:
-    - lint_and_test
-  rules:
-    - if: '$HAS_RELEVANT_FILE_CHANGES == "true"'
-      when: on_success
-    - when: never
-  script:
-    - yarn install
-    - yarn build
-
-  # save the build artifacts ('dist' folder) so they can pass to the publish stage
-  artifacts:
     paths:
-      - dist/
-    expire_in: 1 week
-
-release:
-  stage: release
-  script:
-    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
-    - echo "Publishing version -> $(node -p
-      "require('./package.json').version")" # print package version before publishing
-    - npm publish
-    # since publish needs build stage to happen anyway so no need to put the anchor here
-    # it will only run if build successfully happens
-  needs:
-    - build
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]-gitlabci\.[0-9]+$/'
-      when: on_success
+      - .gitlab/pipeline-config.yml
+    expire_in: 10 minutes
+# https://docs.gitlab.com/ci/pipelines/downstream_pipelines/#trigger-a-dynamic-child-pipeline
+trigger_child_pipeline:
+  stage: trigger
+  trigger:
+    include:
+      - artifact: .gitlab/pipeline-config.yml
+        job: check_for_relevant_files
+    strategy: depend

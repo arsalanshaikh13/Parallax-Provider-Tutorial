@@ -1,0 +1,60 @@
+image: node:18-alpine
+
+default:
+  # global cache for node_modules directory
+  # cache key is based on yarn.lock file.
+  # this ensures cache is only recreated if a dependency is added,updated, or removed
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules/
+
+stages:
+  - test
+  - build
+  - release
+
+lint_and_test:
+  stage: test
+  needs:
+    - check_for_relevant_files
+  script:
+    - echo "This was triggered by: $CI_PIPELINE_SOURCE"
+    - yarn install
+    - yarn lint
+    - yarn test
+
+build:
+  stage: build
+  needs:
+    - lint_and_test
+  rules:
+    - if: '$HAS_RELEVANT_FILE_CHANGES == "true"'
+      when: on_success
+    - when: never
+  script:
+    - yarn install
+    - yarn build
+
+  # save the build artifacts ('dist' folder) so they can pass to the publish stage
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+
+release:
+  stage: release
+  script:
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+    - echo "Publishing version -> $(node -p
+      "require('./package.json').version")" # print package version before publishing
+    - npm publish
+    # since publish needs build stage to happen anyway so no need to put the anchor here
+    # it will only run if build successfully happens
+  needs:
+    - build
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]-gitlabci\.[0-9]+$/'
+      when: on_success
