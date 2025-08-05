@@ -51,21 +51,31 @@ check_for_relevant_files:
       set +e # gitlabci exits immediately by default due set -e so reverse the exit condition here to capture error
 
       if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] ||
-          ! git rev-parse "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
+          ! git cat-file -e "$CI_COMMIT_BEFORE_SHA" >/dev/null 2>&1; then
 
-          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
+          CHANGED=$(git show --pretty="" --name-only "$CI_COMMIT_SHA" 2>&1 | grep -E '\.js$|\.json$|\.yml$|\..*rc$' )
       else
-          CHANGED=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA"  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' 2>/dev/null)
+          CHANGED=$(git diff --pretty="" --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" 2>&1  | grep -E '\.js$|\.json$|\.yml$|\..*rc$' )
       fi
+      echo "output of diff: $CHANGED "
       if [ -z "$CHANGED" ]; then
         echo "No relevant changes found. Stopping pipeline."
-        exit 1
+        echo "HAS_RELEVANT_FILE_CHANGES=false" >> report.env
       fi
       echo "Found relevant changes: $CHANGED"
+      echo "HAS_RELEVANT_FILE_CHANGES=true" >> report.env
+  # using artifacts:reports:dotenv to pass environment variable to the subsequent job as signal to start or stop subsequent jobs
+  artifacts:
+    reports:
+      dotenv: report.env
+    expire_in: 10 minutes
+
 lint_and_test:
   stage: test
   needs:
     - check_for_relevant_files
+  rules:
+    - if: '$HAS_RELEVANT_FILE_CHANGES == "true"'
   script:
     - yarn install
     - yarn lint
