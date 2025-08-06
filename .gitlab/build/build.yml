@@ -1,8 +1,5 @@
 build:
   stage: build
-  needs:
-    - job: lint_and_test
-      artifacts: false # don't download lint_and_test artifacts
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
       when: on_success

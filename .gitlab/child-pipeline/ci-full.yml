@@ -30,11 +30,16 @@ lint_and_test:
     <<: *cache_common
 
 build:
+  needs:
+    - job: lint_and_test
+      artifacts: false # don't download lint_and_test artifacts
   cache:
     <<: *cache_common
     policy: pull
 
 release:
+  needs:
+    - build
   cache:
     <<: *cache_common
     policy: pull
