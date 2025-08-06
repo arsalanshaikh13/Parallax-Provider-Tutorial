@@ -11,7 +11,7 @@ on:
 
 jobs:
   filter-changes:
-    uses: ./.github/workflows/jobs/filter-changes.yml
+    uses: ./.github/workflows/filter-changes.yml
 
   test-and-build:
     # This job will only run if the 'filter-changes' job's output is 'true'.
@@ -19,10 +19,10 @@ jobs:
     needs: filter-changes
     # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/pass-job-outputs
     if: needs.filter-changes.outputs.has_relevant_changes == 'true'
-    uses: ./.github/workflows/jobs/test_and_build.yml
+    uses: ./.github/workflows/test_and_build.yml
 
   publish:
     needs: test-and-build
     if: startswith(github.ref, 'refs/tags/v') # only on version tags
-    uses: ./.github/workflows/jobs/publish.yml
+    uses: ./.github/workflows/publish.yml
     secrets: inherit
