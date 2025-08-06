@@ -23,7 +23,7 @@ lint_and_test:
     - when: never
 
   script:
-    - yarn install --frozen-lockfile
+    - yarn install --frozen-lockfile --ignore-scripts
     - yarn lint
     - yarn test
   coverage: /All files[^|]*|[^|]*\s+([\d\.]+)/
@@ -53,7 +53,7 @@ build:
     - when: never
 
   script:
-    - yarn install --frozen-lockfile
+    - yarn install --frozen-lockfile --ignore-scripts
     - yarn build
 
   # save the build artifacts ('dist' folder) so they can pass to the publish stage
@@ -74,7 +74,7 @@ release:
     - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
     - echo "Publishing version -> $(node -p
       "require('./package.json').version")" # print package version before publishing
-    - npm publish
+    - npm publish --ignore-scripts # ignore running scripts in package.json
     # since publish needs build stage to happen anyway so no need to put the anchor here
     # it will only run if build successfully happens
   needs:
