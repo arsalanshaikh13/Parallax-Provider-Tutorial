@@ -1,0 +1,34 @@
+# default:
+#   # global cache for node_modules directory
+#   # cache key is based on yarn.lock file.
+#   # this ensures cache is only recreated if a dependency is added,updated, or removed
+
+.cache_common: &cache_common
+  key:
+    files:
+      - yarn.lock
+  paths:
+    - node_modules/
+
+lint_and_test:
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+      when: on_success
+    - when: never
+  before_script:
+    - yarn install --frozen-lockfile --ignore-scripts
+  script:
+    - yarn lint
+    - yarn test
+  coverage: /All files[^|]*|[^|]*\s+([\d\.]+)/
+  artifacts:
+    paths:
+      - coverage/
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/clover.xml
+    expire_in: 1 day
+  cache:
+    <<: *cache_common

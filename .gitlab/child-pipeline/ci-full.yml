@@ -1,0 +1,14 @@
+image: node:18-alpine
+
+include:
+  project: 'arsalanshaikh13/Parallax-Provider-Tutorial'
+  ref: gitlabci
+  file:
+    - '.gitlab/lint_and_test/lint_and_test.yml'
+    - '.gitlab/build/build.yml'
+    - '.gitlab/release/release.yml'
+
+stages:
+  - test
+  - build
+  - release

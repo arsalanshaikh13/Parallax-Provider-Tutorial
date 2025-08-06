@@ -1,0 +1,34 @@
+# default:
+#   # global cache for node_modules directory
+#   # cache key is based on yarn.lock file.
+#   # this ensures cache is only recreated if a dependency is added,updated, or removed
+
+.cache_common: &cache_common
+  key:
+    files:
+      - yarn.lock
+  paths:
+    - node_modules/
+
+build:
+  stage: build
+  needs:
+    - job: lint_and_test
+      artifacts: false # don't download lint_and_test artifacts
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+      when: on_success
+    - when: never
+  before_script:
+    - yarn install --frozen-lockfile --ignore-scripts
+  script:
+    - yarn build
+
+  # save the build artifacts ('dist' folder) so they can pass to the publish stage
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+  cache:
+    <<: *cache_common
+    policy: pull
