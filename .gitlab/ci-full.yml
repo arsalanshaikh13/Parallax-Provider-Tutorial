@@ -10,7 +10,6 @@ default:
         - yarn.lock
     paths:
       - node_modules/
-
 stages:
   - test
   - build
@@ -25,7 +24,7 @@ lint_and_test:
 
   script:
     - echo "This was triggered by $CI_PIPELINE_SOURCE"
-    - yarn install
+    - yarn install --frozen-lockfile
     - yarn lint
     - yarn test
   coverage: /All files[^|]*|[^|]*\s+([\d\.]+)/
@@ -41,14 +40,15 @@ lint_and_test:
 build:
   stage: build
   needs:
-    - lint_and_test
+    - job: lint_and_test
+      artifacts: false # don't download lint_and_test artifacts
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
       when: on_success
     - when: never
 
   script:
-    - yarn install
+    - yarn install --frozen-lockfile
     - yarn build
 
   # save the build artifacts ('dist' folder) so they can pass to the publish stage
