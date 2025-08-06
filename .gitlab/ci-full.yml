@@ -4,12 +4,12 @@ image: node:18-alpine
 #   # global cache for node_modules directory
 #   # cache key is based on yarn.lock file.
 #   # this ensures cache is only recreated if a dependency is added,updated, or removed
-#   cache:
-#     key:
-#       files:
-#         - yarn.lock
-#     paths:
-#       - node_modules/
+.cache_common: &cache_common
+  key:
+    files:
+      - yarn.lock
+  paths:
+    - node_modules/
 stages:
   - test
   - build
@@ -36,11 +36,7 @@ lint_and_test:
         path: coverage/clover.xml
     expire_in: 1 day
   cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-      - node_modules/
+    <<: *cache_common
 
 build:
   stage: build
@@ -62,11 +58,7 @@ build:
       - dist/
     expire_in: 1 week
   cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-      - node_modules/
+    <<: *cache_common
     policy: pull
 release:
   stage: release
@@ -79,6 +71,9 @@ release:
     # it will only run if build successfully happens
   needs:
     - build
+  cache:
+    <<: *cache_common
+    policy: pull
   rules:
     - if:
         '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]-gitlabci\.[0-9]+$/ &&
