@@ -11,96 +11,18 @@ on:
 
 jobs:
   filter-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      # https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax#outputs-for-docker-container-and-javascript-actions
-      has_relevant_changes: ${{ steps.check-changes.outputs.has_changes }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          # We need a full history to compare commits correctly
-          fetch-depth: 0
+    uses: ./.github/workflows/jobs/filter-changes.yml
 
-      - name: Check for relevant file changes
-        id: check-changes
-        run: |
-          set +e
-          # Use git diff to find changes between the previous commit and the current one.
-          # The grep command filters for the file extensions you specified.
-          # The result is saved as a step output, which can be used in other jobs.
-          # capture the error and show it the output
-          changed_files=$(git diff --name-only  HEAD^ ${{ github.sha }} 2>&1 | grep -E '\.js$|\.json$|\.yml$|\.lock$|\..*rc$')
-          echo $changed_files output
-          if [ -n "$changed_files" ]; then
-            echo "Relevant files have been changed."
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "No relevant files were changed. Skipping subsequent jobs."
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          fi
-  build-and-test:
-    name: Lint, Test, and Build
-    runs-on: ubuntu-latest
+  test-and-build:
     # This job will only run if the 'filter-changes' job's output is 'true'.
     # This is the key to skipping the entire job on empty commits.
     needs: filter-changes
     # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/pass-job-outputs
     if: needs.filter-changes.outputs.has_relevant_changes == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Test
-        run: yarn test
-
-      - name: Build
-        run: yarn build
-
-      - name: Upload build artifacts (dist/)
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
+    uses: ./.github/workflows/jobs/test_and_build.yml
 
   publish:
-    name: Publish to npm
-    needs: build-and-test
-    runs-on: ubuntu-latest
+    needs: test-and-build
     if: startswith(github.ref, 'refs/tags/v') # only on version tags
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          registry-url: 'https://registry.npmjs.org/'
-
-      - name: Install dependencies
-        run: yarn install --ignore-scripts
-
-      - name: Download build artifacts (dist/)
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+    uses: ./.github/workflows/jobs/publish.yml
+    secrets: inherit
