@@ -34,8 +34,8 @@ lint_and_test:
       - coverage/
     reports:
       coverage_report:
-        coverage_format: lcov
-        path: coverage/lcov.info
+        coverage_format: cobertura
+        path: coverage/clover.xml
     expire_in: 1 day
 
 build:
