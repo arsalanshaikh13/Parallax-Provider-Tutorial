@@ -10,15 +10,19 @@ runs:
 
     - name: Install dependencies
       run: yarn install  --frozen-lockfile
+      shell: bash
 
     - name: Lint
       run: yarn lint
+      shell: bash
 
     - name: Test
       run: yarn test
+      shell: bash
 
     - name: Build
       run: yarn build
+      shell: bash
 
     - name: Upload build artifacts (dist/)
       uses: actions/upload-artifact@v4

@@ -10,6 +10,7 @@ runs:
 
     - name: Install dependencies
       run: yarn install --ignore-scripts --frozen-lockfile
+      shell: bash
 
     - name: Download build artifacts (dist/)
       uses: actions/download-artifact@v4
