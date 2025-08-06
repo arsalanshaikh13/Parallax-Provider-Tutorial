@@ -28,6 +28,15 @@ lint_and_test:
     - yarn install
     - yarn lint
     - yarn test
+  coverage: /All files[^|]*|[^|]*\s+([\d\.]+)/
+  artifacts:
+    paths:
+      - coverage/
+    reports:
+      coverage_report:
+        coverage_format: lcov
+        path: coverage/lcov.info
+    expire_in: 1 day
 
 build:
   stage: build
