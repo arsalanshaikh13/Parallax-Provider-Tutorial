@@ -8,7 +8,33 @@ include:
     - '.gitlab/build/build.yml'
     - '.gitlab/release/release.yml'
 
+# default:
+#   # global cache for node_modules directory
+#   # cache key is based on yarn.lock file.
+#   # this ensures cache is only recreated if a dependency is added,updated, or removed
+
+.cache_common: &cache_common
+  key:
+    files:
+      - yarn.lock
+  paths:
+    - node_modules/
+
 stages:
   - test
   - build
   - release
+
+lint_and_test:
+  cache:
+    <<: *cache_common
+
+build:
+  cache:
+    <<: *cache_common
+    policy: pull
+
+release:
+  cache:
+    <<: *cache_common
+    policy: pull
