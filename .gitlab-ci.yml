@@ -1,5 +1,5 @@
 # docker image to use for all jobs
-image: node:18-alpine
+image: alpine:latest
 
 # set workflow rules for all the stages, exit the workflow if rules don't match
 workflow:

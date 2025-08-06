@@ -1,3 +1,4 @@
+image: busybox:latest
 stages:
   - skip
 
