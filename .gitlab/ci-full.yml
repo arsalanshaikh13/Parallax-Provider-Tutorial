@@ -21,9 +21,9 @@ lint_and_test:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
       when: on_success
     - when: never
-
-  script:
+  before_script:
     - yarn install --frozen-lockfile --ignore-scripts
+  script:
     - yarn lint
     - yarn test
   coverage: /All files[^|]*|[^|]*\s+([\d\.]+)/
@@ -47,9 +47,9 @@ build:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
       when: on_success
     - when: never
-
-  script:
+  before_script:
     - yarn install --frozen-lockfile --ignore-scripts
+  script:
     - yarn build
 
   # save the build artifacts ('dist' folder) so they can pass to the publish stage
