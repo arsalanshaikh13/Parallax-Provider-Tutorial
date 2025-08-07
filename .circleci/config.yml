@@ -13,19 +13,19 @@ executors:
     docker:
       - image: busybox:latest # Or any image with bash & coreutils
 
-# jobs:
-#   generate-config:
-#     executor: default-executor
-#     steps:
-#       - checkout
-#       - run:
-#           name: Generate config_continued.yml
-#           command: sh .circleci/preprocessor.sh
+jobs:
+  generate-config:
+    executor: default-executor
+    steps:
+      - checkout
+      - run:
+          name: Generate config_continued.yml
+          command: sh .circleci/preprocessor.sh
 
-#       - persist_to_workspace:
-#           root: .
-#           paths:
-#             - .circleci/config_continued.yml
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .circleci/config_continued.yml
 
 # the setup workflow that runs first on everypipeline
 workflows:
