@@ -20,7 +20,7 @@ jobs:
       - checkout
       - run:
           name: Generate config_continue.yml
-          command: bash .circleci/preprocessor.sh
+          command: sh .circleci/preprocessor.sh
 
   path-filtering/filter:
     # nothing to change here, orb job remains the same

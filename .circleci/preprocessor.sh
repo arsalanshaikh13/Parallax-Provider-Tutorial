@@ -29,7 +29,3 @@ if [ -f ".circleci/src/workflows/workflow.yml" ]; then
   echo "" >> "$OUTPUT_FILE"
 fi
 
-# Validate (optional)
-if command -v circleci &> /dev/null; then
-  circleci config validate "$OUTPUT_FILE"
-fi
