@@ -11,18 +11,9 @@ orbs:
 executors:
   default-executor:
     docker:
-      - image: alpine:latest
+      - image: busybox:latest
 
 jobs:
-  install-git-ssh:
-    executor: default-executor
-    steps:
-      - run:
-          name: Install Git and SSH
-          command: |
-            apk add --no-cache git openssh
-      - run: git --version
-      - run: ssh -V
   generate-config:
     executor: default-executor
     steps:
@@ -40,12 +31,14 @@ jobs:
 workflows:
   path-filtering-setup:
     jobs:
-      - install-git-ssh
-      - generate-config
+      - generate-config:
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
       - path-filtering/filter:
           requires:
-            - install-git-ssh
             - generate-config
+
           # Use this pipeline variable to compare against the previous commit
           # on the current branch that triggered the pipeline
 
