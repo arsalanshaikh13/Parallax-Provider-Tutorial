@@ -31,7 +31,7 @@ jobs:
 workflows:
   path-filtering-setup:
     jobs:
-      # - generate-config
+      - generate-config
       - path-filtering/filter:
           # requires: [generate-config]
           # Use this pipeline variable to compare against the previous commit
