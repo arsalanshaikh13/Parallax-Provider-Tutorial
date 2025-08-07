@@ -2,6 +2,9 @@ name: Publish to npm
 
 on:
   workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
 
 jobs:
   publish:
@@ -10,7 +13,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - uses: ./.github/actions/publish/
+
+      - name: Setup, install, download artifacts
+        uses: ./.github/actions/publish/
+
       - name: Publish to npm
         run: npm publish
         env:

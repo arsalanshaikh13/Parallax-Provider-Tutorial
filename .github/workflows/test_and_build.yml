@@ -10,4 +10,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - uses: ./.github/actions/test_and_build
+
+      - name: Setup, install,lint,test and build code
+        uses: ./.github/actions/test_and_build
