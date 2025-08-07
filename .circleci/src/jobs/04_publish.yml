@@ -1,0 +1,12 @@
+publish:
+  executor: node_executor
+  steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - run:
+        name: Authenticate with npm
+        command: |
+          # Use the NPM_TOKEN environment variable for authentication
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+    - run: npm publish

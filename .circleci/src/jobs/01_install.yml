@@ -1,0 +1,19 @@
+install:
+  executor: node_executor
+  steps:
+    - checkout
+    - restore_cache:
+        keys:
+          - yarn-deps-{{ checksum "yarn.lock" }}
+    #updated: install git and yarn. Alpine based images are very minimal and
+    # may not have git or yarn pre-installed
+    - run: apk add --no-cache git
+    - run: yarn install
+    - save_cache:
+        paths:
+          - node_modules
+        key: yarn-deps-{{ checksum "yarn.lock" }}
+    - persist_to_workspace:
+        root: .
+        paths:
+          - node_modules

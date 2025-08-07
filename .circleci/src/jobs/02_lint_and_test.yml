@@ -1,0 +1,8 @@
+lint_and_test:
+  executor: node_executor
+  steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - run: yarn lint
+    - run: yarn test

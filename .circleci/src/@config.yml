@@ -1,0 +1,23 @@
+# this file is dynamically loaded by the setup config if file changes are detected
+version: 2.1
+# this parameter will be passed from the path-filtering orb.
+# it is set to 'true' if the file regexes in config.yml have a match
+parameters:
+  run-build-and-release:
+    type: boolean
+    default: false
+# Define reusable executor
+executors:
+  node_executor:
+    docker:
+      # - image: cimg/node:18.20
+      # updated: using the lightweight 'node:18-alpine' image for faster download in ci setup and faster pipelines
+      - image: node:18-alpine
+
+anchors:
+  tag_filter: &tag_filter
+    tags:
+      only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
+  branch_filter: &branch_filter
+    branches:
+      only: circleci

@@ -8,11 +8,30 @@ setup: true
 orbs:
   path-filtering: circleci/path-filtering@2.0.2
 
+executors:
+  default-executor:
+    docker:
+      - image: busybox:latest # Or any image with bash & coreutils
+
+jobs:
+  generate-config:
+    executor: default-executor
+    steps:
+      - checkout
+      - run:
+          name: Generate config_continue.yml
+          command: bash .circleci/preprocessor.sh
+
+  path-filtering/filter:
+    # nothing to change here, orb job remains the same
+
 # the setup workflow that runs first on everypipeline
 workflows:
   path-filtering-setup:
     jobs:
+      - generate-config
       - path-filtering/filter:
+          requires: [generate-config]
           # Use this pipeline variable to compare against the previous commit
           # on the current branch that triggered the pipeline
 
@@ -23,7 +42,7 @@ workflows:
           mapping:
             # Trigger the build_and_release workflow for this file extenisons
             # this regex will match any .js, .json, .yml, or .rc
-            (.*\.(js|json|yml)$)|(\..*rc$) run-build-and-release true
+            (.*\.(js|json|yml|lock|sh)$)|(\..*rc$) run-build-and-release true
           # by default path-filter always works for branches so no need for mentioning filter branch
           # filters is only required for tag push
           filters:

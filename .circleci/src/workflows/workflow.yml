@@ -1,0 +1,27 @@
+version: 2.1
+build_and_release:
+  when: << pipeline.parameters.run-build-and-release >>
+  jobs:
+    - install:
+        filters:
+          <<: *branch_filter
+          <<: *tag_filter
+    - lint_and_test:
+        requires:
+          - install
+        filters:
+          <<: *branch_filter
+          <<: *tag_filter
+    - build:
+        requires:
+          - lint_and_test
+        filters:
+          <<: *branch_filter
+          <<: *tag_filter
+    - publish:
+        requires:
+          - build
+        filters:
+          branches:
+            ignore: /.*/ # Ignore all branches
+          <<: *tag_filter
