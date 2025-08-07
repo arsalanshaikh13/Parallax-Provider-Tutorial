@@ -55,3 +55,7 @@ workflows:
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
+          pre-steps:
+            - checkout
+            - attach_workspace:
+                at: .
