@@ -27,9 +27,10 @@ jobs:
       - run:
           name: Show generated config
           command: cat .circleci/config_continued.yml
-
-  path-filtering/filter:
-    # nothing to change here, orb job remains the same
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .circleci/config_continued.yml
 
 # the setup workflow that runs first on everypipeline
 workflows:
