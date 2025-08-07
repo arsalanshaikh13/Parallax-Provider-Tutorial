@@ -37,7 +37,7 @@ workflows:
 
           base-revision: circleci
           # this is the path to the second configuration file to run
-          config-path: .circleci/config_continue.yml
+          config-path: .circleci/config_continued.yml
           # Define the mapping of regex patterns to pipeline parameters
           mapping:
             # Trigger the build_and_release workflow for this file extenisons

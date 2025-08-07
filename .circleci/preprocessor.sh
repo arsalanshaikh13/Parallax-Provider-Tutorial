@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-OUTPUT_FILE=".circleci/config_continue.yml"
+OUTPUT_FILE=".circleci/config_continued.yml"
 
 # echo "version: 2.1" > "$OUTPUT_FILE"
 # echo "" >> "$OUTPUT_FILE"
-echo "# Circle CI config split up in modules" >> $OUTPUT_FILE
+echo "# Circle CI config split up in modules" > $OUTPUT_FILE
 echo "# https://medium.com/%40philblenk6/circleci-config-splitting-7024bad400e3" >> $OUTPUT_FILE
 echo "# https://github.com/blenky36/circleci-config-splitting?source=post_page-----7024bad400e3---------------------------------------" >> $OUTPUT_FILE
 # Executors
