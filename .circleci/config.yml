@@ -33,7 +33,7 @@ workflows:
     jobs:
       - generate-config
       - path-filtering/filter:
-          # requires: [generate-config]
+          requires: [generate-config]
           # Use this pipeline variable to compare against the previous commit
           # on the current branch that triggered the pipeline
 
