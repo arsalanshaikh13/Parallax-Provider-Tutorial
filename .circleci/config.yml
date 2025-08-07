@@ -47,9 +47,6 @@ workflows:
             (.*\.(js|json|yml|lock|sh)$)|(\..*rc$) run-build-and-release true
           # by default path-filter always works for branches so no need for mentioning filter branch
           # filters is only required for tag push
-          filters:
-            tags:
-              only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
           workspace_path: .
           # https://circleci.com/developer/orbs/orb/circleci/path-filtering
           # checkout: false
