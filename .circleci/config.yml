@@ -44,7 +44,7 @@ workflows:
           mapping:
             # Trigger the build_and_release workflow for this file extenisons
             # this regex will match any .js, .json, .yml, or .rc
-            (.*\.(js|json|yml|lock|sh)$)|(\..*rc$) run-build-and-release true
+            .* run-build-and-release true
           # by default path-filter always works for branches so no need for mentioning filter branch
           # filters is only required for tag push
           workspace_path: .
