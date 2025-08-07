@@ -22,8 +22,11 @@ jobs:
           name: Debug Script Contents
           command: cat .circleci/preprocessor.sh
       - run:
-          name: Generate config_continue.yml
+          name: Generate config_continued.yml
           command: sh .circleci/preprocessor.sh
+      - run:
+          name: Show generated config
+          command: cat .circleci/config_continued.yml
 
   path-filtering/filter:
     # nothing to change here, orb job remains the same
