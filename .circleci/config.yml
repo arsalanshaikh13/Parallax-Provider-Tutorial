@@ -19,6 +19,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Debug Script Contents
+          command: cat .circleci/preprocessor.sh
+      - run:
           name: Generate config_continue.yml
           command: sh .circleci/preprocessor.sh
 
