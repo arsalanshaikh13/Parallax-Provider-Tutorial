@@ -19,14 +19,9 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Debug Script Contents
-          command: cat .circleci/preprocessor.sh
-      - run:
           name: Generate config_continued.yml
           command: sh .circleci/preprocessor.sh
-      - run:
-          name: Show generated config
-          command: cat .circleci/config_continued.yml
+
       - persist_to_workspace:
           root: .
           paths:
@@ -55,7 +50,10 @@ workflows:
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+-circleci\.\d+$/
-          pre-steps:
-            - checkout
-            - attach_workspace:
-                at: .
+          workspace_path: .
+          # https://circleci.com/developer/orbs/orb/circleci/path-filtering
+          # checkout: false
+          # pre-steps:
+          #   - checkout
+          #   - attach_workspace:
+          #       at: .
