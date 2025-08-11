@@ -1,7 +1,13 @@
 name: Build, Test and Publish
 
 on:
-  workflow_dispatch:
+  # https://goobar.dev/manually-trigger-a-github-actions-workflow/
+  # https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
+  # https://docs.github.com/en/webhooks/webhook-events-and-payloads#repository_dispatch
+  # https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git
+  repository_dispatch:
+    types:
+      - trigger-from-circleci
   push:
     branches:
       - main
