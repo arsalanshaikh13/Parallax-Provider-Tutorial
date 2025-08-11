@@ -6,8 +6,8 @@ on:
   # https://docs.github.com/en/webhooks/webhook-events-and-payloads#repository_dispatch
   # https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git
   repository_dispatch:
-    types:
-      - trigger-from-circleci
+    # types:
+    #   - trigger-from-circleci
   push:
     branches:
       - main
