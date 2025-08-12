@@ -3,6 +3,7 @@
 name: Trigger CircleCI from GitHub
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - circleci
