@@ -1,11 +1,3 @@
-Below is a polished, publish-ready **README** you can drop into the
-`parallax-provider-tutorial-library` repo. It’s focused on your CircleCI
-implementation, the real problems you found, the exact fixes you applied, and
-the impact those fixes had. You can copy/paste this into `README.md` (or edit
-further to match your repo voice).
-
----
-
 # Parallax Provider Tutorial — CircleCI Implementation & Post-mortem
 
 > Practical notes, debugging and fixes for a modular/dynamic CircleCI pipeline
