@@ -1,6 +1,7 @@
 name: Sync and Trigger GitLab CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - gitlabci # or your branch
