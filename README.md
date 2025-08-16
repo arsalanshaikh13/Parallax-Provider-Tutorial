@@ -15,8 +15,8 @@ they happened**, **how we fixed them**, and **what impact the fixes had**.
 - [Overview](#overview)
 - [Goals](#goals)
 - [What I implemented](#what-i-implemented)
-- [Impact of the fixes](#impact-of-the-fixes)
 - [Architecture Decisions](#Architecture-Decisions)
+- [Impact of the decisions](#impact-of-the-decisions)
 - [GitLab CI: Problems, Root Causes, Solutions, Impacts](#GitLab-CI--Problems--Root-Causes--Solutions--Impacts)
 - [Root Cause Analysis of Key Issues](#Root-Cause-Analysis-of-Key-Issues)
 - [Example config snippets](#example-config-snippets)
@@ -81,17 +81,6 @@ graph LR
 
 ---
 
-## Impact of the fixes
-
-- **Robust change detection** across pushing branches/tags and API triggers.
-- **No more “bad object 000000…”** failures or broken `rules:changes`.
-- **Zero flakiness** around `CI_COMMIT_BEFORE_SHA` and shallow clones.
-- **Cleaner YAML** that scales across repos and branches.
-- **Predictable child pipelines** (full/empty) with clear UI and messages.
-- **Faster pipelines** (lighter images, fewer downloads, smarter cache).
-
----
-
 ## Architecture Decisions
 
 ### Why Parent/Child Pattern?
@@ -111,6 +100,17 @@ graph LR
 - **Speed**: `alpine:latest` (5MB) vs `ubuntu:latest` (72MB)
 - **Cost**: Faster pulls reduce compute time
 - **Security**: Smaller attack surface
+
+---
+
+## Impact of the decisions
+
+- **Robust change detection** across pushing branches/tags and API triggers.
+- **No more “bad object 000000…”** failures or broken `rules:changes`.
+- **Zero flakiness** around `CI_COMMIT_BEFORE_SHA` and shallow clones.
+- **Cleaner YAML** that scales across repos and branches.
+- **Predictable child pipelines** (full/empty) with clear UI and messages.
+- **Faster pipelines** (lighter images, fewer downloads, smarter cache).
 
 ---
 
