@@ -67,8 +67,9 @@ graph LR
     B --> C{Runtime Diff Check}
     C -->|Changes Found| D[Full Child Pipeline]
     C -->|No Changes| E[Skip Child Pipeline]
-    D --> F[Lint → Test → Build → Publish]
-    E --> G[Skip Job Only]
+    D --> |branch| F[Lint → Test → Build ]
+    D --> |tag| G[Lint → Test → Build → Publish]
+    E --> H[Skip Job Only]
 ```
 
 ### Key Components
