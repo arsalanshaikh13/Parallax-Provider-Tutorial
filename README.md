@@ -215,20 +215,16 @@ they happened**, **how we fixed them**, and **what impact the fixes had**.
 
 ```
 .gitlab/
-  ci-parent.yml
-  child-full.yml
-  child-empty.yml
-  scripts/
-    generate-pipeline.sh
-common-template/
-  jobs/
-    lint.yml
-    test.yml
+  build/
     build.yml
+  lint_and_test/
+    lint_and_test.yml
+  release/
     release.yml
-  includes/
-    cache-anchors.yml
-    rules-anchors.yml
+  child-pipeline/
+    child-full.yml
+    child-empty.yml
+  generate-pipeline.sh
 ```
 
 ### Parent pipeline (`.gitlab-ci.yml`)
