@@ -1,6 +1,5 @@
 name: Lint, Test and Build
 runs:
-  runs-on: ubuntu-latest
   using: 'composite'
   steps:
     - name: Setup Node.js
@@ -45,6 +44,7 @@ runs:
         echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
         cat "${{ github.workspace }}/coverage/clover.md" >> $GITHUB_STEP_SUMMARY
+      shell: bash
       if: always()
 
     - name: Upload build artifacts (dist/)
