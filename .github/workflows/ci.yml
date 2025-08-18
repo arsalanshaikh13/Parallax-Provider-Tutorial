@@ -8,6 +8,9 @@ on:
   repository_dispatch:
     types:
       - trigger-from-circleci
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main

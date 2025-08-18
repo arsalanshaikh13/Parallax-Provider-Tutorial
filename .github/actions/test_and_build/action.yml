@@ -1,5 +1,6 @@
 name: Lint, Test and Build
 runs:
+  runs-on: ubuntu-latest
   using: 'composite'
   steps:
     - name: Setup Node.js
@@ -24,8 +25,31 @@ runs:
       run: yarn build
       shell: bash
 
+    # https://www.youtube.com/watch?v=ClLKbB_59Ec&list=PLiO7XHcmTsleVSRaY7doSfZryYWMkMOxB&index=11
+    # create a test summary markdown file
+    # if you don't specify an output file, it will automatically add
+    # as a job summary. if you specify an output file, you have to
+    # create your own step of adding it to the job summary. I am
+    # intentionally doing that to show job summaries
+    - name: Create test summary
+      uses: test-summary/action@v2.4
+      with:
+        paths: ${{ github.workspace }}/coverage/clover.xml
+        output: ${{ github.workspace }}/coverage/clover.md
+        show: 'all'
+      if: always()
+
+    # Adding the test results to the Job summary
+    - name: Add the test Results to Job summary
+      run: |
+        echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
+        cat "${{ github.workspace }}/coverage/clover.md" >> $GITHUB_STEP_SUMMARY
+      if: always()
+
     - name: Upload build artifacts (dist/)
       uses: actions/upload-artifact@v4
       with:
         name: dist
-        path: dist/
+        path: dist/**
+        if-no-files-found: error
