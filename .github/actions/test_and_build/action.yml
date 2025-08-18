@@ -30,22 +30,36 @@ runs:
     # as a job summary. if you specify an output file, you have to
     # create your own step of adding it to the job summary. I am
     # intentionally doing that to show job summaries
-    - name: Create test summary
-      uses: test-summary/action@v2.4
+    # - name: Create test summary
+    #   uses: test-summary/action@v2.4
+    #   with:
+    #     paths: ${{ github.workspace }}/coverage/*.xml
+    #     output: ${{ github.workspace }}/coverage/clover.md
+    #     show: 'all'
+    #   if: always()
+    - name: Jest Coverage Comment
+      id: coverageComment
+      uses: Mishakav/jest-coverage-comment@main
       with:
-        paths: ${{ github.workspace }}/coverage/clover.xml
-        output: ${{ github.workspace }}/coverage/clover.md
-        show: 'all'
-      if: always()
+        hide-comment: true
+        coverage-summary-path: ${{github.workspace}}/coverage/coverage-final.json
 
-    # Adding the test results to the Job summary
-    - name: Add the test Results to Job summary
+    # # Adding the test results to the Job summary
+    # - name: Add the test Results to Job summary
+    #   run: |
+    #     echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
+    #     echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
+    #     cat "${{ github.workspace }}/coverage/clover.md" >> $GITHUB_STEP_SUMMARY
+    #   shell: bash
+    #   if: always()
+    - name: Check the output coverage
       run: |
         echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
-        cat "${{ github.workspace }}/coverage/clover.md" >> $GITHUB_STEP_SUMMARY
-      shell: bash
-      if: always()
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage Percentage - ${{steps.coverageComment.outputs.coverage }}" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage color - ${{ steps.coverageComment.outputs.color }}" >> $GITHUB_STEP_SUMMARY
+        echo "summary HTML - ${{steps.coverageComment.outputs.summaryHTML }}" >> $GITHUB_STEP_SUMMARY
+      shell: Bash
 
     - name: Upload build artifacts (dist/)
       uses: actions/upload-artifact@v4
