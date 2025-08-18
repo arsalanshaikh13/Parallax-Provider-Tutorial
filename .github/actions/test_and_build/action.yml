@@ -1,4 +1,8 @@
 name: Lint, Test and Build
+inputs:
+  secret_input_github_token:
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -41,7 +45,7 @@ runs:
       id: coverage
       uses: mattallty/jest-github-action@v1
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.secret_input_github_token }}
         test-command: 'yarn test'
 
     # # Adding the test results to the Job summary
