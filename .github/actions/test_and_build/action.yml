@@ -43,6 +43,7 @@ runs:
     #   if: always()
     - name: Jest Coverage Comment
       id: coverage
+      # GITHUB_TOKEN is the name of variable used internally by mattalty/jest-github-action
       env:
         GITHUB_TOKEN: ${{ inputs.secret_input_github_token }}
       uses: mattallty/jest-github-action@v1
