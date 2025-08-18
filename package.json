@@ -12,7 +12,7 @@
   "scripts": {
     "build": " yarn clean && rollup -c",
     "dev": "rollup -c -w",
-    "test": "jest",
+    "test": "jest --json --coverage --outputFile=./coverage/report.json",
     "test:watch": "jest src --watch ",
     "prepare": "husky",
     "lint": "eslint src",
