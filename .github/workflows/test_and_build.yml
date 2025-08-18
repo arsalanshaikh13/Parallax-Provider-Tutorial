@@ -3,7 +3,7 @@ name: Lint, Test, and Build
 on:
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      secret_GITHUB_TOKEN:
         required: true
 
 jobs:
@@ -17,4 +17,4 @@ jobs:
       - name: Setup, install,lint,test and build code
         uses: ./.github/actions/test_and_build
         with:
-          secret_input_github_token: ${{secrets.GITHUB_TOKEN}}
+          secret_input_github_token: ${{secrets.secret_GITHUB_TOKEN}}

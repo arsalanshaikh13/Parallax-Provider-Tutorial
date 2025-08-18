@@ -31,7 +31,7 @@ jobs:
     if: needs.filter-changes.outputs.has_relevant_changes == 'true'
     uses: ./.github/workflows/test_and_build.yml
     secrets:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      secret_GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
   publish:
     needs: test-and-build
