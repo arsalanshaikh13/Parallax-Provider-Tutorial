@@ -38,11 +38,12 @@ runs:
     #     show: 'all'
     #   if: always()
     - name: Jest Coverage Comment
-      id: coverageComment
-      uses: Mishakav/jest-coverage-comment@main
+      id: coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: mattallty/jest-github-action@v1
       with:
-        hide-comment: true
-        coverage-summary-path: ${{github.workspace}}/coverage/coverage-final.json
+        test-command: 'yarn test'
 
     # # Adding the test results to the Job summary
     # - name: Add the test Results to Job summary
@@ -59,7 +60,7 @@ runs:
         echo "Coverage Percentage - ${{steps.coverageComment.outputs.coverage }}" >> $GITHUB_STEP_SUMMARY
         echo "Coverage color - ${{ steps.coverageComment.outputs.color }}" >> $GITHUB_STEP_SUMMARY
         echo "summary HTML - ${{steps.coverageComment.outputs.summaryHTML }}" >> $GITHUB_STEP_SUMMARY
-      shell: Bash
+      shell: bash
 
     - name: Upload build artifacts (dist/)
       uses: actions/upload-artifact@v4
