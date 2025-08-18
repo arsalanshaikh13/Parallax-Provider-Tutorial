@@ -34,6 +34,8 @@ runs:
     # as a job summary. if you specify an output file, you have to
     # create your own step of adding it to the job summary. I am
     # intentionally doing that to show job summaries
+    # this example was used in mickey gousset video on github action part 5 but his app was built in .NET
+    # so this action didn't support clover.xml file
     # - name: Create test summary
     #   uses: test-summary/action@v2.4
     #   with:
@@ -43,12 +45,24 @@ runs:
     #   if: always()
     - name: Jest Coverage Comment
       id: coverage
+      # this example of mattalty/jest-github-action
+      # https://github.com/marketplace/actions/jest-annotations-coverage
       # GITHUB_TOKEN is the name of variable used internally by mattalty/jest-github-action
-      env:
-        GITHUB_TOKEN: ${{ inputs.secret_input_github_token }}
-      uses: mattallty/jest-github-action@v1
+      # env:
+      #   GITHUB_TOKEN: ${{ inputs.secret_input_github_token }}
+      # uses: mattallty/jest-github-action@v1
+      # with:
+      #   test-command: 'yarn test'
+      # this is the example of artiomjr/jest-coverage-report
+      # https://github.com/marketplace/actions/jest-coverage-report
+      # https://medium.com/@tuxdev/coverage-of-jest-unit-tests-using-github-action-ffb6372cdfe
+      uses: ArtiomTr/jest-coverage-report-action@v2
       with:
-        test-command: 'yarn test'
+        github-token: ${{ inputs.secret_input_github_token }} # github-token is the internal variable name inside ArtiomTr/jest-coverage/report-action
+        annotations: all
+        skip-step: install
+        test-script: yarn test
+        icons: emoji
 
     # # Adding the test results to the Job summary
     # - name: Add the test Results to Job summary
@@ -61,7 +75,6 @@ runs:
     - name: Check the output coverage
       run: |
         echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
         echo "Coverage Percentage - ${{steps.coverageComment.outputs.coverage }}" >> $GITHUB_STEP_SUMMARY
         echo "Coverage color - ${{ steps.coverageComment.outputs.color }}" >> $GITHUB_STEP_SUMMARY
         echo "summary HTML - ${{steps.coverageComment.outputs.summaryHTML }}" >> $GITHUB_STEP_SUMMARY

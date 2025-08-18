@@ -26,6 +26,8 @@ jobs:
   test-and-build:
     # set permissions here to avoid the error : Resource not accessible by integration
     # we can only set the permission inside the original yml file which calls the reusable workflow
+    # https://medium.com/@tuxdev/coverage-of-jest-unit-tests-using-github-action-ffb6372cdfe
+    # https://github.com/marketplace/actions/jest-coverage-report
     permissions:
       checks: write
       pull-requests: write
