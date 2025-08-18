@@ -43,9 +43,11 @@ runs:
     #   if: always()
     - name: Jest Coverage Comment
       id: coverage
+      env:
+        gh_token: ${{ inputs.secret_input_github_token }}
       uses: mattallty/jest-github-action@v1
       with:
-        github-token: ${{ inputs.secret_input_github_token }}
+        github-token: ${{env.gh_token}}
         test-command: 'yarn test'
 
     # # Adding the test results to the Job summary
