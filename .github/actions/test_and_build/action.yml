@@ -24,6 +24,13 @@ runs:
       run: yarn test
       shell: bash
 
+    - name: Upload test coverage artifacts (coverage/)
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: coverage/**
+        if-no-files-found: error
+
     - name: Build
       run: yarn build
       shell: bash
@@ -45,23 +52,14 @@ runs:
     #   if: always()
     - name: Jest Coverage Comment
       id: coverage
-      # this example of mattalty/jest-github-action
-      # https://github.com/marketplace/actions/jest-annotations-coverage
-      # GITHUB_TOKEN is the name of variable used internally by mattalty/jest-github-action
-      # env:
-      #   GITHUB_TOKEN: ${{ inputs.secret_input_github_token }}
-      # uses: mattallty/jest-github-action@v1
-      # with:
-      #   test-command: 'yarn test'
-      # this is the example of artiomjr/jest-coverage-report
       # https://github.com/marketplace/actions/jest-coverage-report
       # https://medium.com/@tuxdev/coverage-of-jest-unit-tests-using-github-action-ffb6372cdfe
       uses: ArtiomTr/jest-coverage-report-action@v2
       with:
         github-token: ${{ inputs.secret_input_github_token }} # github-token is the internal variable name inside ArtiomTr/jest-coverage/report-action
         annotations: all
-        skip-step: install
-        test-script: yarn test
+        coverage-file: ${{github.workspace}}/coverage/coverage-final.json
+        output: comment, report-markdown
         icons: emoji
 
     # # Adding the test results to the Job summary
@@ -75,10 +73,10 @@ runs:
     - name: Check the output coverage
       run: |
         echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
-        echo "Coverage Percentage - ${{steps.coverageComment.outputs.coverage }}" >> $GITHUB_STEP_SUMMARY
-        echo "Coverage color - ${{ steps.coverageComment.outputs.color }}" >> $GITHUB_STEP_SUMMARY
-        echo "summary HTML - ${{steps.coverageComment.outputs.summaryHTML }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo " ${{steps.coverage.outputs.report }}" >> $GITHUB_STEP_SUMMARY
       shell: bash
+      if: always()
 
     - name: Upload build artifacts (dist/)
       uses: actions/upload-artifact@v4
