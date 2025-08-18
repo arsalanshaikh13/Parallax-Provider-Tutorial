@@ -24,13 +24,6 @@ runs:
       run: yarn test
       shell: bash
 
-    - name: Upload test coverage artifacts (coverage/)
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage
-        path: coverage/**
-        if-no-files-found: error
-
     - name: Build
       run: yarn build
       shell: bash
@@ -58,6 +51,8 @@ runs:
       with:
         github-token: ${{ inputs.secret_input_github_token }} # github-token is the internal variable name inside ArtiomTr/jest-coverage/report-action
         annotations: all
+        # this will skip installing dependencies and running test-script, by default skip-step: none so it will install and run test-script
+        skip-step: all
         coverage-file: ${{github.workspace}}/coverage/coverage-final.json
         output: comment, report-markdown
         icons: emoji
