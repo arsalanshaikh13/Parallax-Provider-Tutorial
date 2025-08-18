@@ -70,7 +70,7 @@ runs:
       run: |
         echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo " ${{steps.coverage.outputs.report }}" >> $GITHUB_STEP_SUMMARY
+        cat  "${{steps.coverage.outputs.report }}" >> $GITHUB_STEP_SUMMARY
       shell: bash
       if: always()
 
