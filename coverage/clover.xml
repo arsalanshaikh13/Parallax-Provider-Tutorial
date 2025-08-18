@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1754111952760" clover="3.2.0">
-  <project timestamp="1754111952760" name="All files">
+<coverage generated="1755535293584" clover="3.2.0">
+  <project timestamp="1755535293584" name="All files">
     <metrics statements="58" coveredstatements="58" conditionals="9" coveredconditionals="9" methods="3" coveredmethods="3" elements="70" coveredelements="70" complexity="0" loc="58" ncloc="58" packages="1" files="1" classes="1"/>
     <file name="index.mjs" path="C:\Users\DELL\ArsVSCode\CS50p_project\project_aFinal\website\website 2.0\animations\scroll\parallaxturtlelib\src\index.mjs">
       <metrics statements="58" coveredstatements="58" conditionals="9" coveredconditionals="9" methods="3" coveredmethods="3"/>

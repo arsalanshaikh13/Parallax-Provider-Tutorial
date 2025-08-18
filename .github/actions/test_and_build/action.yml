@@ -53,8 +53,8 @@ runs:
         annotations: all
         # this will skip installing dependencies and running test-script, by default skip-step: none so it will install and run test-script
         skip-step: all
-        coverage-file: ${{github.workspace}}/coverage/coverage-final.json
-        base-coverage-file: ${{github.workspace}}/coverage/coverage-final.json
+        coverage-file: ${{github.workspace}}/report.json
+        base-coverage-file: ${{github.workspace}}/report.json
         output: comment, report-markdown
         icons: emoji
 
