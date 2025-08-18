@@ -39,8 +39,8 @@ runs:
     #   if: always()
     - name: Jest Coverage Comment
       id: coverage
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # env:
+      #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: mattallty/jest-github-action@v1
       with:
         test-command: 'yarn test'
