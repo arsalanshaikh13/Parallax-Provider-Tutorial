@@ -1,4 +1,8 @@
 name: Lint, Test and Build
+inputs:
+  secret_input_github_token:
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -24,8 +28,48 @@ runs:
       run: yarn build
       shell: bash
 
+    # https://www.youtube.com/watch?v=ClLKbB_59Ec&list=PLiO7XHcmTsleVSRaY7doSfZryYWMkMOxB&index=11
+    # create a test summary markdown file
+    # if you don't specify an output file, it will automatically add
+    # as a job summary. if you specify an output file, you have to
+    # create your own step of adding it to the job summary. I am
+    # intentionally doing that to show job summaries
+    # - name: Create test summary
+    #   uses: test-summary/action@v2.4
+    #   with:
+    #     paths: ${{ github.workspace }}/coverage/*.xml
+    #     output: ${{ github.workspace }}/coverage/clover.md
+    #     show: 'all'
+    #   if: always()
+    - name: Jest Coverage Comment
+      id: coverage
+      # GITHUB_TOKEN is the name of variable used internally by mattalty/jest-github-action
+      env:
+        GITHUB_TOKEN: ${{ inputs.secret_input_github_token }}
+      uses: mattallty/jest-github-action@v1
+      with:
+        test-command: 'yarn test'
+
+    # # Adding the test results to the Job summary
+    # - name: Add the test Results to Job summary
+    #   run: |
+    #     echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
+    #     echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
+    #     cat "${{ github.workspace }}/coverage/clover.md" >> $GITHUB_STEP_SUMMARY
+    #   shell: bash
+    #   if: always()
+    - name: Check the output coverage
+      run: |
+        echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage Percentage - ${{steps.coverageComment.outputs.coverage }}" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage color - ${{ steps.coverageComment.outputs.color }}" >> $GITHUB_STEP_SUMMARY
+        echo "summary HTML - ${{steps.coverageComment.outputs.summaryHTML }}" >> $GITHUB_STEP_SUMMARY
+      shell: bash
+
     - name: Upload build artifacts (dist/)
       uses: actions/upload-artifact@v4
       with:
         name: dist
-        path: dist/
+        path: dist/**
+        if-no-files-found: error
