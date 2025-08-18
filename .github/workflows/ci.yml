@@ -24,6 +24,12 @@ jobs:
     uses: ./.github/workflows/filter-changes.yml
 
   test-and-build:
+    # set permissions here to avoid the error : Resource not accessible by integration
+    # we can only set the permission inside the original yml file which calls the reusable workflow
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
     # This job will only run if the 'filter-changes' job's output is 'true'.
     # This is the key to skipping the entire job on empty commits.
     needs: filter-changes
