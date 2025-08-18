@@ -5,7 +5,6 @@ on:
     secrets:
       secret_GITHUB_TOKEN:
         required: true
-        type: string
 
 jobs:
   test-and-build:
