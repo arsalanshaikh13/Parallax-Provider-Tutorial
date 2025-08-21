@@ -2,18 +2,14 @@ name: Publish
 runs:
   using: 'composite'
   steps:
+    # since i am restoring of cached node_modules then no need to setup node
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         registry-url: 'https://registry.npmjs.org/'
 
-    - name: Get node version
-      id: node_v
-      run: |
-        echo "version=$(node -v)" >> $GITHUB_OUTPUT
-      shell: bash
-
+    # https://github.com/actions/cache/blob/main/restore/README.md#save-intermediate-private-build-artifacts
     - name: Restore cached node_modules
       id: node_modules_restore
       uses: actions/cache/restore@v4
@@ -21,14 +17,15 @@ runs:
         path: |
           **/node_modules
         key:
-          ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}-${{
-          steps.node_v.outputs.version }}
+          ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock')
+          }}-v18.20.8
+        # if cache-restore is empty then exit
+        fail-on-cache-miss: true
 
     - name: Install dependencies
       # https://github.com/marketplace/actions/cache#skipping-steps-based-on-cache-hit
       # only install if there is no cache
       if: steps.node_modules_restore.outputs.cache-hit != 'true'
-
       run: yarn install --ignore-scripts --frozen-lockfile
       shell: bash
 
