@@ -6,24 +6,24 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.20.8
-        # https://github.com/actions/setup-node
-        # https://oozou.com/blog/ci-cd-tips-improve-your-ci-cd-with-cache-github-version-209
-        # # this only caches the node packages, but still yarn install will take time as yarn install has to compile the code in yarn packages to specific node version
-        # # for advance caching see below
-        # cache: 'yarn'
-        # # ensure is cache is dependent on yarn.lock, so cache is update when dependencies change, useful for caching in monorepo
-        # cache-dependency-path: yarn.lock
+    # - name: Setup Node.js
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: 18.20.8
+    # https://github.com/actions/setup-node
+    # https://oozou.com/blog/ci-cd-tips-improve-your-ci-cd-with-cache-github-version-209
+    # # this only caches the node packages, but still yarn install will take time as yarn install has to compile the code in yarn packages to specific node version
+    # # for advance caching see below
+    # cache: 'yarn'
+    # # ensure is cache is dependent on yarn.lock, so cache is update when dependencies change, useful for caching in monorepo
+    # cache-dependency-path: yarn.lock
 
     # https://oozou.com/blog/ci-cd-tips-improve-your-ci-cd-with-cache-github-version-209
-    - name: Get node version
-      id: node_v
-      run: |
-        echo "version=$(node -v)" >> $GITHUB_OUTPUT
-      shell: bash
+    # - name: Get node version
+    #   id: node_v
+    #   run: |
+    #     echo "version=$(node -v)" >> $GITHUB_OUTPUT
+    #   shell: bash
 
     - name: Get node_modules
       uses: actions/cache@v4
@@ -34,8 +34,10 @@ runs:
         # hashing yarn.lock to freeze package dependencies version and checking for those specific verison only
         # Adding node version as cache key
         key:
-          ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}-${{
-          steps.node_v.outputs.version }}
+          # ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}-${{
+          # steps.node_v.outputs.version }}
+          ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock')
+          }}-v18.20.8
 
     - name: Install dependencies
       # https://github.com/marketplace/actions/cache#skipping-steps-based-on-cache-hit

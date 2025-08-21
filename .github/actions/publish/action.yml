@@ -8,7 +8,27 @@ runs:
         node-version: '18'
         registry-url: 'https://registry.npmjs.org/'
 
+    - name: Get node version
+      id: node_v
+      run: |
+        echo "version=$(node -v)" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Restore cached node_modules
+      id: node_modules_restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          **/node_modules
+        key:
+          ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}-${{
+          steps.node_v.outputs.version }}
+
     - name: Install dependencies
+      # https://github.com/marketplace/actions/cache#skipping-steps-based-on-cache-hit
+      # only install if there is no cache
+      if: steps.node_modules_restore.outputs.cache-hit != 'true'
+
       run: yarn install --ignore-scripts --frozen-lockfile
       shell: bash
 
