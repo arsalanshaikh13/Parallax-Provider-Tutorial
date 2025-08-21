@@ -38,6 +38,9 @@ runs:
           steps.node_v.outputs.version }}
 
     - name: Install dependencies
+      # https://github.com/marketplace/actions/cache#skipping-steps-based-on-cache-hit
+      # only install if there is no cache
+      if: steps.node_modules.outputs.cache-hit != 'true'
       run: yarn install  --frozen-lockfile
       shell: bash
 
