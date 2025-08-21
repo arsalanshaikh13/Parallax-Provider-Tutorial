@@ -25,6 +25,7 @@ runs:
     #     echo "version=$(node -v)" >> $GITHUB_OUTPUT
     #   shell: bash
 
+    # check for node_modules cache
     - name: Get node_modules
       uses: actions/cache@v4
       id: node_modules
@@ -38,6 +39,13 @@ runs:
           # steps.node_v.outputs.version }}
           ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock')
           }}-v18.20.8
+
+      # setting up node only when cache-hit is false
+    - name: Setup Node.js
+      if: steps.node_modules.outputs.cache-hit != 'true'
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.20.8
 
     - name: Install dependencies
       # https://github.com/marketplace/actions/cache#skipping-steps-based-on-cache-hit
