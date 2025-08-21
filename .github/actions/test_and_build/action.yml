@@ -10,7 +10,11 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        # this only caches the node packages, but still yarn install will take time as yarn install has to compile the code in yarn packages to specific node version
+        # for advance caching see below
         cache: 'yarn'
+        # ensure is cache is dependent on yarn.lock, so cache is update when dependencies change, useful for caching in monorepo
+        cache-dependency-path: yarn.lock
 
     - name: Install dependencies
       run: yarn install  --frozen-lockfile
@@ -76,9 +80,15 @@ runs:
       shell: bash
       if: always()
 
+    # https://github.com/actions/upload-artifact
     - name: Upload build artifacts (dist/)
       uses: actions/upload-artifact@v4
       with:
+        # name of the artifact zip file
         name: dist
+        # upload all the files from the dist folder
         path: dist/**
+        # behavior when no files found
         if-no-files-found: error
+        # duration after which the artifact expire
+        retention-days: 1 day
