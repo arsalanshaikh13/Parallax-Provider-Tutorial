@@ -31,6 +31,7 @@ runs:
       with:
         path: |
           **/node_modules
+        # hashing yarn.lock to freeze package dependencies version and checking for those specific verison only
         # Adding node version as cache key
         key:
           ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}-${{
