@@ -164,233 +164,15 @@ flowchart LR
 
 ## Root Cause Analysis of Key Issues
 
-| Problem                                             | Root Cause                                                                                                                 | Solution                                                                                              | Impact                                   |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| **Composite action couldn’t access secrets**        | Composite actions **never inherit** `secrets` or `env`, even within same repo                                              | Pass secrets **explicitly** as action inputs; forward them from caller → reusable → action            | Secure & predictable secret flow         |
-| **Reusable workflow couldn’t write coverage to PR** | Reusable workflows **inherit permissions from caller**; default is **read-only** for `checks`, `pull-requests`, `contents` | Set `permissions` in **caller** workflow (`checks: write`, `pull-requests: write`, `contents: write`) | Coverage now appears on PR + job summary |
-| **Change filters didn’t trigger jobs**              | Shallow clone + naive `git diff` against wrong base                                                                        | Fetch base ref, compute proper merge-base on PRs, use robust diff; emit outputs for `needs`           | Correctly skips/executes jobs            |
-| **Cache restored inconsistently**                   | Cache key didn’t include lockfile hash                                                                                     | Cache key uses `hashFiles('**/package-lock.json')`                                                    | Reliable cache hits                      |
-| **Cache restored inconsistently**                   | Cache key didn’t include lockfile hash                                                                                     | Cache key uses `hashFiles('**/package-lock.json')`                                                    | Reliable cache hits                      |
+| Problem                                                                                       | Root Cause                                                                                                                 | Solution                                                                                                                                         | Impact                                          |
+| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| **Composite action couldn’t access secrets**                                                  | Composite actions **never inherit** `secrets` or `env`, even within same repo                                              | Pass secrets **explicitly** as action inputs; forward them from caller → reusable → action                                                       | Secure & predictable secret flow                |
+| **Reusable workflow couldn’t write coverage to PR**                                           | Reusable workflows **inherit permissions from caller**; default is **read-only** for `checks`, `pull-requests`, `contents` | Set `permissions` in **caller** workflow (`checks: write`, `pull-requests: write`, `contents: write`)                                            | Coverage now appears on PR + job summary        |
+| **Change filters didn’t trigger jobs**                                                        | Shallow clone + naive `git diff` against wrong base                                                                        | use explicit git diff between github.sha and HEAD^ i.e previous commit sha in filter-changes.yml and emit outputs for `needs` in parent workflow | Correctly skips/executes jobs on relevant files |
+|                                                                                               |
+| **Resource Resource not accessible by integration integration error on PR for jest coverage** | only read/none permission is set for checks, contents, pull requests                                                       | explicit write permissions for checks, contents, pull requests                                                                                   | Reliably jest coverage report is surfaced on PR |
 
 #### <p align="right">(<a style="cursor:pointer" href="#readme-top">back to top</a>)</p>
-
-## Example Config Snippets
-
-### 1) Parent caller workflow (`ci.yml`)
-
-```yaml
-name: Build, Test and Publish
-
-on:
-  repository_dispatch:
-    types:
-      - trigger-from-circleci
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
-      # github actions does not take regex patterns but takes glob patterns
-    tags:
-      - 'v[0-9].[0-9]+.[0-9]+' # Trigger release when pushing tags like v1.0.0
-
-jobs:
-  filter-changes:
-    uses: ./.github/workflows/filter-changes.yml
-
-  test-and-build:
-    # set permissions to avoid Resource integration error
-    permissions:
-      checks: write
-      pull-requests: write
-      contents: write
-    # This job will only run if the 'filter-changes' job's output is 'true'.
-    # This is the key to skipping the entire job on empty commits.
-    needs: filter-changes
-    if: needs.filter-changes.outputs.has_relevant_changes == 'true'
-    uses: ./.github/workflows/test_and_build.yml
-    secrets:
-      secret_GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-  publish:
-    needs: test-and-build
-    if: startswith(github.ref, 'refs/tags/v') # only on version tags
-    uses: ./.github/workflows/publish.yml
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-```
-
-### 2) Reusable workflow (`lint_test_and_build.yml`)
-
-```yaml
-name: Lint, Test, and Build
-
-on:
-  workflow_call:
-    secrets:
-      secret_GITHUB_TOKEN:
-        required: true
-
-jobs:
-  test-and-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup, install,lint,test and build code
-        uses: ./.github/actions/test_and_build
-        with:
-          secret_input_github_token: ${{secrets.secret_GITHUB_TOKEN}}
-```
-
-### 3) Composite action (`.github/actions/lint_test_and_build/action.yml`)
-
-```yaml
-name: Lint, Test and Build
-inputs:
-  secret_input_github_token:
-    required: true
-
-runs:
-  using: 'composite'
-  steps:
-    # check for node_modules cache
-    - name: Get node_modules
-      uses: actions/cache@v4
-      id: node_modules
-      with:
-        path: |
-          **/node_modules
-        # hashing yarn.lock to freeze package dependencies version and checking for those specific verison only
-        # Adding node version as cache key
-        key:
-          ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock')
-          }}-v18.20.8
-
-      # setting up node only when cache-hit is false
-    - name: Setup Node.js
-      if: steps.node_modules.outputs.cache-hit != 'true'
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.20.8
-
-    - name: Install dependencies
-      if: steps.node_modules.outputs.cache-hit != 'true'
-      run: yarn install  --frozen-lockfile
-      shell: bash
-
-    - name: Lint
-      run: yarn lint
-      shell: bash
-
-    - name: Test
-      run: yarn test
-      shell: bash
-
-    - name: Build
-      run: yarn build
-      shell: bash
-
-    - name: Jest Coverage Comment
-      id: coverage
-      uses: ArtiomTr/jest-coverage-report-action@v2
-      with:
-        github-token: ${{ inputs.secret_input_github_token }}
-        annotations: all
-        skip-step: all
-        coverage-file: ${{github.workspace}}/coverage/report.json
-        base-coverage-file: ${{github.workspace}}/coverage/report.json
-        output: comment, report-markdown
-        icons: emoji
-
-    - name: Check the output coverage
-      run: |
-        echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        cat <<EOF >> "$GITHUB_STEP_SUMMARY"
-        ${{ steps.coverage.outputs.report }}
-        EOF
-      shell: bash
-      if: always()
-
-    - name: Upload build artifacts (dist/)
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: dist/**
-        if-no-files-found: error
-        retention-days: 1 day
-```
-
-### 4) Custom file-change filter (git diff + regex)
-
-If you want this as a **standalone composite action**:
-
-```yaml
-# .github/actions/changed-files-filter/action.yml
-name: Changed Files Filter
-inputs:
-  base:
-    required: false
-  head:
-    required: false
-  pattern:
-    required: true
-runs:
-  using: 'composite'
-  steps:
-    - shell: bash
-      id: scan
-      run: |
-        BASE="${{ inputs.base || github.event.pull_request.base.sha || github.event.before }}"
-        HEAD="${{ inputs.head || github.sha }}"
-        if [ -z "$BASE" ]; then
-          BASE=$(git rev-list --max-parents=0 HEAD | tail -n 1)
-        fi
-        git diff --name-only "$BASE" "$HEAD" > changed.txt
-        if grep -E "${{ inputs.pattern }}" changed.txt >/dev/null; then
-          echo "matched=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "matched=false" >> "$GITHUB_OUTPUT"
-        fi
-outputs:
-  matched:
-    value: ${{ steps.scan.outputs.matched }}
-```
-
-### 5) Jest coverage report on PRs and job Summary
-
-> Requires write permissions on the **caller** workflow (not inside the reusable
-> workflow).
-
-```yaml
-- name: Jest Coverage Comment
-      id: coverage
-      uses: ArtiomTr/jest-coverage-report-action@v2
-      with:
-        github-token: ${{ inputs.secret_input_github_token }}
-        annotations: all
-        skip-step: all
-        coverage-file: ${{github.workspace}}/coverage/report.json
-        base-coverage-file: ${{github.workspace}}/coverage/report.json
-        output: comment, report-markdown
-        icons: emoji
-
-
-- name: Check the output coverage
-    run: |
-        echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        cat <<EOF >> "$GITHUB_STEP_SUMMARY"
-        ${{ steps.coverage.outputs.report }}
-        EOF
-        shell: bash
-    if: always()
-
-```
 
 ---
 
@@ -404,9 +186,9 @@ outputs:
 
   ```
   git --version
-  git rev-parse HEAD
-  echo "$BASE_SHA $HEAD_SHA"
-  git diff --name-only "$BASE_SHA" "$HEAD_SHA"
+  git rev-parse ${{ github.sha }}
+  git rev-parse HEAD^
+  git diff --name-only  HEAD^ ${{ github.sha }}
   ```
 
 - Cache keys: print them to logs to compare:
@@ -480,7 +262,7 @@ outputs:
 | ----------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------- |
 | `secrets.X not found` in composite action | Composite actions don’t inherit secrets        | Pass via action `inputs`; forward from caller → reusable → action             |
 | Coverage not posted to PR                 | Caller workflow didn’t grant write permissions | Set at top of **caller**: `permissions: checks/pull-requests/contents: write` |
-| Change filter never matches               | Wrong merge base or shallow clone              | Use `fetch-depth: 0` or fetch base; compute proper base SHA                   |
+| Change filter never matches               | Wrong merge base or shallow clone              | Use `fetch-depth: 0` or git diff ; compute proper base SHA                    |
 | Cache miss every run                      | Key doesn’t include lockfile hash              | Use `hashFiles('**/package-lock.json')` in key                                |
 | Reusable workflow sees read-only token    | Permissions must be defined in caller          | Define `permissions:` in caller; reusable inherits                            |
 
