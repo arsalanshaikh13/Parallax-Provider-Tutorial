@@ -19,7 +19,6 @@
     <li><a href="#architecture-decisions">Architecture Decisions</a></li>
     <li><a href="#impact-of-the-decisions">Impact of the Decisions</a></li>
     <li><a href="#root-cause-analysis-of-key-issues">Root Cause Analysis of Key Issues</li>
-    <li><a href="#example-config-snippets">Example Config Snippets</a></li>
     <li><a href="#debug-checklist-commands">Debug Checklist / Commands</a></li>
     <li><a href="#best-practices--recommendations">Best Practices &amp; Recommendations</a></li>
     <li><a href="#results-of-the-fixes">Results of the Fixes</a></li>
