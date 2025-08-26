@@ -111,12 +111,13 @@ graph TB
 
 ### Modular Architecture Decisions
 
-| Component                | Purpose                                       | Benefit                |
-| ------------------------ | --------------------------------------------- | ---------------------- |
-| **Reusable Workflows**   | Orchestrate test/build/publish phases         | Cross-repo consistency |
-| **Composite Actions**    | Encapsulate shared logic (setup, caching)     | Reduced duplication    |
-| **Explicit Permissions** | Required permission declaration at each level | Security compliance    |
-| **Artifact Sharing**     | Controlled data flow between jobs             | Deterministic builds   |
+| Component                | Purpose                                                                                                        | Benefit                                |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **Reusable Workflows**   | Orchestrate test/build/publish phases                                                                          | Cross-repo consistency                 |
+| **Composite Actions**    | Encapsulate shared logic (setup, caching)                                                                      | Reduced duplication                    |
+| **Explicit Permissions** | Required permission declaration at each level                                                                  | Security compliance                    |
+| **Artifact Sharing**     | Controlled data flow between jobs                                                                              | Deterministic builds                   |
+| **node_modules caching** | faster restoration, Controlled dependency flows between workflows, avoid linking dependencies in each workflow | Deterministic restoration of depencies |
 
 ## 🔧 Critical Solutions Deep Dive
 

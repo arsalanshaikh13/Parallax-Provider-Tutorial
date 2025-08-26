@@ -1,0 +1,27 @@
+table of contents
+Overview
+problem statement
+Goals
+What I implemented
+key innovations, why it matters/ technical solutions , what is its impact
+why the project and features are useful and matter to businesses, developers
+Architecture Decisions, layout + implementation pattern/key components explained(components -> purpose -> benefit ), design decisions, tradeoffs
+Impact of the decisions: measured results: performance improvements , developer experience, business impact
+Problems, Root Causes, Solutions, Impacts
+Root Cause Analysis of Key Issues, key insights
+Example config snippets/ technical implementations : problem , solution code , why the code solution works
+Debug checklist / commands
+Best practices & recommendations & caveats/gotchas, why the best practices works
+Result of the fixes
+Common errors and solutions
+Lessons Learned: what worked well, what i'd do differently, key insights, future enhancements
+known limitations and scope of the project
+i want to make readme file for my github actions implementation for parallax-provider-tutorial-library, containing what problems i face how i solved it and what was the impact of the solution, considering the above points THINK through DEEPLY and then using that thinking provide the readme file to publish on github, i want in chat and not in canvas THINK DEEPLY and then provide the readme file to publish on github in chat and not in canvas
+act as a devops expert/senior devops guy and critic this readme providing constructive feedback with reasoning root causes of mistakes and fixes, and then using that reasoning provide refactored readme to showcase in portfolio for potential hiring managers, senior developers to work under, produce the readme in chat and not in canvas
+
+
+
+
+implementation guide
+prerequisites
+installation/ usage / configuration / migration
