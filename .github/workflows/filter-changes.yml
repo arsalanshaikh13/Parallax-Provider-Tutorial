@@ -15,9 +15,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        # fetch last 2 commit
         with:
-          # We need a full history to compare commits correctly
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Check for relevant file changes
         id: check-changes

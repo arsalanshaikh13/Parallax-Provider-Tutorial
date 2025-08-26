@@ -252,10 +252,9 @@ flowchart TD
 # Efficient file-based job triggering
 detect_changes:
 
-   # Always fetch full history for change detection
    - uses: actions/checkout@v4
      with:
-       fetch-depth: 0
+       fetch-depth: 2 # fetching last 2 commits
 
   - steps:
       - name: Check for relevant changes
@@ -396,7 +395,7 @@ on Pull Request and Job summary
 
 - **Performance**
   - Prefer `node_modules` cache for this repo over Yarn global cache.
-  - Keep `fetch-depth: 0` for robust diffs for repeated rollbacks .
+  - Keep `fetch-depth: 2` for robust diffs for repeated rollbacks .
 
 - **Artifacts**
   - Use `upload-artifact` / `download-artifact` to avoid rebuilding between
@@ -405,6 +404,12 @@ on Pull Request and Job summary
   - Use `cache key` to successfully and securely save and retrive the caches for
     node modules and yarn packages and since the hash key is based on yarn.lock
     file check for changes in the dependencies between the builds
+- **Resetting tags for rollbacks**
+  - after deleting the tag, always reset hard to previous commit and then force
+    push previous commit, then create the new commit+tag using npm version patch
+    and then successfully push the same tag again, this way we can push tags
+    with just fetching previous 2 commits only instead of fetching full git
+    history
 
 ---
 
@@ -423,13 +428,13 @@ on Pull Request and Job summary
 
 ## Common Errors and Solutions
 
-| Error                                     | Why it happens                                 | Fix                                                                                                   |
-| ----------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `secrets.X not found` in composite action | Composite actions don’t inherit secrets        | Pass via action `inputs`; forward from caller → reusable → action                                     |
-| Coverage not posted to PR                 | Caller workflow didn’t grant write permissions | Set in specific job mentioned in caller workflow: `permissions: checks/pull-requests/contents: write` |
-| Change filter never matches               | Wrong merge base or shallow clone              | Use `fetch-depth: 0` or git diff ; compute proper base SHA                                            |
-| Cache miss every run                      | Key doesn’t include lockfile hash              | Use `hashFiles('**/yarn.lock')` in key                                                                |
-| Reusable workflow sees read-only token    | Permissions must be defined in caller          | Define `permissions:` in caller; reusable inherits                                                    |
+| Error                                                            | Why it happens                                                                                     | Fix                                                                                                                                                      |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `secrets.X not found` in composite action                        | Composite actions don’t inherit secrets                                                            | Pass via action `inputs`; forward from caller → reusable → action                                                                                        |
+| Coverage not posted to PR                                        | Caller workflow didn’t grant write permissions                                                     | Set in specific job mentioned in caller workflow: `permissions: checks/pull-requests/contents: write`                                                    |
+| Change filter never matches                                      | Wrong merge base or shallow clone                                                                  | Use `fetch-depth: 2` to checkout code to make git diff work and compare proper parent commit SHA with current commit SHA                                 |
+| git tag push for same tag doesn't get recognized after rollbacks | git keeps the tag reference commit even after deleting the tag since it is still the latest commit | after deleting the tag first force reset hard to previous commit then force push the previous commit and the push the new commit with the same tag again |
+| Reusable workflow sees read-only token                           | Permissions must be defined in caller                                                              | Define `permissions:` in caller; reusable inherits                                                                                                       |
 
 ### Key insights on Some key issues
 
@@ -450,11 +455,12 @@ on Pull Request and Job summary
    - **Architecture Impact**: Cache strategy affects both performance and
      reliability
 
-3. **Change Detection Reliability**:
+3. **Change Detection Reliability for tag push**:
    - **Git Complexity**: Shallow clones and merge base calculation are
-     notoriously tricky in CI environments especially for rollbacks
-   - **Solution Strength**: the two-pronged approach (SHA validation + depth
-     management) addresses the core issues
+     notoriously tricky in CI environments especially for rollbacks for tags
+   - **Solution Strength**: keep fetch-depth 2 to compare parent commit with
+     current commit using git diff, in case of rollbacks first force push the
+     previous commit, then push the new commit which has the tag version in it
 
 4. **Secrets Inheritance Problems in composite actions**:
    - **Behavior**: Composite actions don't inherit secrets context
