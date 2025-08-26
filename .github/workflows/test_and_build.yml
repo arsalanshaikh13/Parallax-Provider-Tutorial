@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup, install,lint,test and build code
+      - name: Setup, install, lint, test and build code
         uses: ./.github/actions/test_and_build
         with:
           secret_input_github_token: ${{secrets.secret_GITHUB_TOKEN}}

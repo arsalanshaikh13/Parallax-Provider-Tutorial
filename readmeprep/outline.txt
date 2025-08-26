@@ -3,7 +3,7 @@ Overview
 problem statement
 Goals
 What I implemented
-key innovations, why it matters/ technical solutions , what is its impact
+key innovations, why it matters/what it solves/technical solutions , what is its impact
 why the project and features are useful and matter to businesses, developers
 Architecture Decisions, layout + implementation pattern/key components explained(components -> purpose -> benefit ), design decisions, tradeoffs
 Impact of the decisions: measured results: performance improvements , developer experience, business impact
