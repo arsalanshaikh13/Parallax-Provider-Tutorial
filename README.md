@@ -61,7 +61,7 @@ project expanded:
 - Difficult to maintain and debug single 100+ line YAML file
 - Cache inefficiencies causing unnecessary dependency reinstalls
 
-**Impact**: Slower development velocity, poor maintainability, frustrated
+**Impact**: Slower development velocity, poor maintainability, frustrating
 developing experience
 
 ## Goals
@@ -83,7 +83,8 @@ with following features:
   actions.
 - **Inter-pipeline Communication**: Parent workflow passes **inputs & secrets**
   to reusable workflows; those forward inputs to composite actions. Steps emit
-  outputs → jobs → workflow → parent via `needs.*.outputs`.
+  outputs `steps.<step-id>.outputs.*`→ jobs `jobs.<job>.outputs.*`→ workflow
+  output is executed in parent via `needs.<job>.outputs.*`.
 - **Selective Execution**: Trigger jobs only when relevant files change (custom
   `git diff` + regex).
 - **Caching**: Cache **`node_modules`** instead of Yarn global cache using
@@ -99,13 +100,13 @@ with following features:
 
 ## Key Innovations & Impact
 
-| Innovation                        | Technical Solution                        | Business Impact                       |
-| --------------------------------- | ----------------------------------------- | ------------------------------------- |
-| **Dynamic Change Detection**      | Hybrid git diff/show with depth fallback  | 60% reduction in unnecessary job runs |
-| **Permission-Aware Architecture** | Explicit secret/permission propagation    | Zero security incidents               |
-| **Cache Optimization**            | node_modules caching with hash-based keys | 85% smaller cache footprint           |
-| **Developer Experience**          | Automated PR coverage reporting           | 40% faster review cycles              |
-| **Modular design**                | Reusable workflows and composite actions  | faster and simpler maintainability    |
+| Innovation                                      | Technical Solution                         | Impact                                |
+| ----------------------------------------------- | ------------------------------------------ | ------------------------------------- |
+| **Dynamic Change Detection for relevant files** | git diff with full depth collection + grep | 60% reduction in unnecessary job runs |
+| **Permission-Aware Architecture**               | Explicit secret/permission propagation     | Zero security incidents               |
+| **Cache Optimization**                          | node_modules caching with hash-based keys  | 85% smaller cache footprint           |
+| **Developer Experience**                        | Automated PR coverage reporting            | 40% faster review cycles              |
+| **Modular design**                              | Reusable workflows and composite actions   | faster and simpler maintainability    |
 
 ---
 
@@ -115,13 +116,13 @@ with following features:
 
 ```
 - .github
-  - actions
+  - actions                       # contains all the composite actions
     - publish
       - action.yml
     - test_and_build
       - action.yml
-  - workflows
-    - ci.yml
+  - workflows                     # contains all the reusable workflow that uses actions
+    - ci.yml                      # parent caller workflow that uses reusable workflows
     - filter-changes.yml
     - publish.yml
     - test_and_build.yml
@@ -164,8 +165,8 @@ flowchart TD
 **Implementation Pattern:**
 
 - **Parent workflow**: Orchestrates execution and change detection
-- **Reusable workflows**: Isolated, testable pipeline stages, clean separation
-  of concerns and easier reuse across repos.
+- **Reusable workflows**: clean separation of concerns, Isolated, testable
+  pipeline stages, and easier reuse across repos.
 - **Composite actions**: Share repeatable step blocks (checkout,Node setup,
   cache storing and retrieving, test,build, storing artifacts and retrieving
   artifacts )
@@ -174,8 +175,10 @@ flowchart TD
 
 - **Why explicit secrets?** Reusable workflows **do not inherit**
   secrets/permissions; explicit flow is more secure and predictable.
-- **Why `node_modules` cache?** Smaller, more deterministic across jobs than
-  Yarn’s global cache for this project’s shape.
+- **Why `node_modules` cache?** Smaller, more deterministic restoration across
+  jobs than Yarn’s global cache for this project’s shape as yarn cache still
+  requires dependencies install to match yarn packages with specific node
+  version.
 
 #### Why Modular Over Monolithic?
 
@@ -189,7 +192,7 @@ flowchart TD
 
 - **Cost efficiency**: Avoid unnecessary compute on documentation changes
 - **Developer experience**: Faster feedback for non-critical changes
-- **Resource optimization**: Better runner utilization during peak hours
+- **Resource optimization**: Better runner utilization
 
 #### <p align="right">(<a style="cursor:pointer" href="#readme-top">back to top</a>)</p>
 
@@ -204,7 +207,7 @@ flowchart TD
 | **Install time (deps load)**  |                 17s |                           **9s** | −47%             |
 | **Build stage total**         |                 34s |                          **22s** | −35%             |
 | **Publish stage total**       |                 57s |                          **39s** | −32%             |
-| **non relevant file Changes** |                 34s |                             none | -100%            |
+| **non relevant file Changes** |                 34s |                           **7s** | -80%             |
 | **Cache size**                |      \~110MB (Yarn) |      **\~17MB** (`node_modules`) | −85%             |
 | **Developer feedback**        | coverage local only | **coverage in PR & job summary** | Faster review    |
 | **Maintainability**           |          monolithic |                      **modular** | Easier to evolve |
@@ -222,12 +225,11 @@ flowchart TD
 
 ## Root Cause Analysis of Key Issues
 
-| Problem                                                                                       | Root Cause                                                                                                                 | Solution                                                                                                                                         | Impact                                          |
-| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
-| **Composite action couldn’t access secrets**                                                  | Composite actions **never inherit** `secrets` or `env`, even within same repo                                              | Pass secrets **explicitly** as action inputs; forward them from caller → reusable → action                                                       | Secure & predictable secret flow                |
-| **Reusable workflow couldn’t write coverage to PR**                                           | Reusable workflows **inherit permissions from caller**; default is **read-only** for `checks`, `pull-requests`, `contents` | Set `permissions` in **caller** workflow (`checks: write`, `pull-requests: write`, `contents: write`)                                            | Coverage now appears on PR + job summary        |
-| **Change filters didn’t trigger jobs**                                                        | Shallow clone + naive `git diff` against wrong base                                                                        | use explicit git diff between github.sha and HEAD^ i.e previous commit sha in filter-changes.yml and emit outputs for `needs` in parent workflow | Correctly skips/executes jobs on relevant files |
-| **Resource Resource not accessible by integration integration error on PR for jest coverage** | only read/none permission is set for checks, contents, pull requests                                                       | explicit write permissions for checks, contents, pull requests                                                                                   | Reliably jest coverage report is surfaced on PR |
+| Problem                                                                                               | Root Cause                                                                                                                 | Solution                                                                                                                                     | Impact                                          |
+| ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| **Composite action couldn’t access secrets**                                                          | Composite actions **never inherit** `secrets` or `env`, even within same repo                                              | Pass secrets **explicitly** as action inputs; forward them from caller → reusable workflow → action                                          | Secure & predictable secret flow                |
+| **Resource not accessible by integration error i.e. Reusable workflow couldn’t write coverage to PR** | Reusable workflows **inherit permissions from caller**; default is **read-only** for `checks`, `pull-requests`, `contents` | Set `permissions` in **caller** workflow (`checks: write`, `pull-requests: write`, `contents: write`)                                        | Coverage now appears on PR + job summary        |
+| **Change filters didn’t trigger jobs**                                                                | Shallow clone which resulted naive `git diff` against wrong base                                                           | use explicit git diff between github.sha and HEAD^ i.e previous commit sha in filter-changes.yml and emit outputs needed for parent workflow | Correctly skips/executes jobs on relevant files |
 
 #### <p align="right">(<a style="cursor:pointer" href="#readme-top">back to top</a>)</p>
 
@@ -304,7 +306,9 @@ transferred across jobs.
 **Problem**:
 
 - test coverage was only locally available for review
-- needed to scan jobs log to see the test coverage **Solution**:
+- needed to scan jobs log to see the test coverage.
+
+**Solution**:
 
 ```yaml
 - name: Jest Coverage Comment
@@ -436,16 +440,17 @@ on Pull Request and Job summary
      workflow
 
 2. **Cache Optimization**:
-   - **Deep Analysis**: Yarn's global cache includes transient files and isn't
-     portable between jobs
+   - **Deep Analysis**: Yarn's global cache is a much bigger file still requires
+     installing and linking dependencies to match cache with specific node
+     version
    - **Performance Truth**: node_modules caching provides more deterministic
-     restoration
+     restoration in further pipeline runs
    - **Architecture Impact**: Cache strategy affects both performance and
      reliability
 
 3. **Change Detection Reliability**:
    - **Git Complexity**: Shallow clones and merge base calculation are
-     notoriously tricky in CI environments
+     notoriously tricky in CI environments especially for rollbacks
    - **Solution Strength**: the two-pronged approach (SHA validation + depth
      management) addresses the core issues
 
