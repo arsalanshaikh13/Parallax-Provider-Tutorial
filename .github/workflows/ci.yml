@@ -20,6 +20,7 @@ on:
       - '**.js'
       - '**/package.json'
       - '**/yarn.lock'
+      - '**.*rc'
 
     # git does not take regex patterns but takes glob patterns
     # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#filter-pattern-cheat-sheet
