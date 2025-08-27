@@ -12,6 +12,14 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - '**.json'
+      - '**.js'
+      - '**/package.json'
+      - '**/yarn.lock'
+      - '**.*rc'
+      - '**.yml'
+
   push:
     branches:
       - main
@@ -29,6 +37,7 @@ on:
       - 'v[0-9].[0-9]+.[0-9]+' # Trigger release when pushing tags like v1.0.0
 
 jobs:
+  # paths filter somehow started working along with branches so no need for this job
   # filter-changes:
   # uses: ./.github/workflows/filter-changes.yml
 
@@ -43,7 +52,7 @@ jobs:
       contents: write
     # This job will only run if the 'filter-changes' job's output is 'true'.
     # This is the key to skipping the entire job on empty commits.
-    # needs: filter-changes
+    # needs: filter-changes # paths filter somehow started working along with branches so no need for this job
     # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/pass-job-outputs
     # if: needs.filter-changes.outputs.has_relevant_changes == 'true'
     uses: ./.github/workflows/test_and_build.yml
