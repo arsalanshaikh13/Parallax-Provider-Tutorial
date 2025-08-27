@@ -21,6 +21,7 @@ on:
       - '**/package.json'
       - '**/yarn.lock'
       - '**.*rc'
+      - '**.yml'
 
     # git does not take regex patterns but takes glob patterns
     # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#filter-pattern-cheat-sheet
