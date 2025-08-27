@@ -15,14 +15,20 @@ on:
   push:
     branches:
       - main
-      # git does not take regex patterns but takes glob patterns
-      # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#filter-pattern-cheat-sheet
+    paths:
+      - '**.json'
+      - '**.js'
+      - '**/package.json'
+      - '**/yarn.lock'
+
+    # git does not take regex patterns but takes glob patterns
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#filter-pattern-cheat-sheet
     tags:
       - 'v[0-9].[0-9]+.[0-9]+' # Trigger release when pushing tags like v1.0.0
 
 jobs:
-  filter-changes:
-    uses: ./.github/workflows/filter-changes.yml
+  # filter-changes:
+  # uses: ./.github/workflows/filter-changes.yml
 
   test-and-build:
     # set permissions here to avoid the error : Resource not accessible by integration
@@ -35,9 +41,9 @@ jobs:
       contents: write
     # This job will only run if the 'filter-changes' job's output is 'true'.
     # This is the key to skipping the entire job on empty commits.
-    needs: filter-changes
+    # needs: filter-changes
     # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/pass-job-outputs
-    if: needs.filter-changes.outputs.has_relevant_changes == 'true'
+    # if: needs.filter-changes.outputs.has_relevant_changes == 'true'
     uses: ./.github/workflows/test_and_build.yml
     secrets:
       secret_GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
