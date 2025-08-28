@@ -64,17 +64,168 @@ jobs:
 | **Reusable Workflows** | Clean separation of concerns; isolated, testable pipeline stages                                                    | Consistent and easier reuse across repos |
 | **Composite Actions**  | Share repeatable step blocks (e.g., checkout, Node setup, cache storing/retrieving, test, build, artifact handling) | Reduced duplication                      |
 
+#### 💡 Why Modular Workflows Matter
+
+- **Maintainability** → clear separation of concerns to monitor and fix relevant
+  pieces in their respective workflow or actions in isolation without searching
+  through the other workflow jobs.
+- **Reusability** → share common steps across projects.
+- **Scalability** → add new features (like coverage reports or artifact
+  handling) in a new workflow/actions and call and in the respective caller
+  workflow.
+
 ## Implementation Deep Dive
 
-### 1. Change Detection in the files
+### 1. The Secret and input Passing Chain: Understanding GitHub Actions communication
+
+**Critical Insight**: GitHub Actions has strict security isolation:
+
+- Reusable workflows DON'T inherit secrets from callers
+- Composite actions NEVER see secrets implicitly
+- All secret passing must be explicit
+- pass secrets into reusable workflow using `secrets` key and any variables /
+  parameters using `with` key
+- pass secrets , variables, parameters into composite action as a input using
+  `with` key , theres is no secrets key option in actions
+
+**Implementation Pattern:**
+
+```yaml
+# Parent workflow (.github/workflows/ci.yml)
+jobs:
+# This job runs tests and builds the project.
+  test-and-build:
+    # Reuses a separate workflow file for the test and build logic.
+    uses: ./.github/workflows/test_and_build.yml
+    # passing the secrets into reusable workflow
+    secrets:
+      secret_GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+# Reusable workflow (.github/workflows/test-build.yml)
+name: Lint, Test, and Build
+
+# This defines the workflow as a reusable workflow that can be called by other workflows.
+on:
+  workflow_call:
+    # Specifies the secrets that must be passed in when this workflow is called.
+    secrets:
+      secret_GITHUB_TOKEN:
+        required: true
+
+jobs:
+  test-build:
+    - name: Setup, install, lint, test and build code
+      # This step calls a custom composite action located in the local repository.
+      # This promotes code reuse and keeps the main workflow file clean.
+      uses: ./.github/actions/test_and_build
+      with:
+        # Passes the required secret as input to the composite action.
+        secret_input_github_token: ${{secrets.secret_GITHUB_TOKEN}}
+
+# Composite action (.github/actions/test_and_build/action.yml)
+name: lint, test and build
+# Defines the inputs that this action accepts.
+inputs:
+  secret_input_github_token:
+    required: true
+
+# Specifies that this is a composite run action, which combines multiple steps into a single reusable action.
+runs:
+  using: 'composite'
+  steps:
+      # This action generates a code coverage report and adds it as a comment on the pull request.
+    - name: Generate coverage report
+      uses: ArtiomTr/jest-coverage-report-action@v2
+      with:
+        github-token: ${{ inputs.secret_input_github_token }}
+```
+
+> these are just the some important snippets from the code for full code review
+> visit the repo at:
+> https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
+
+### 2. Output Flow: From Steps in reusable workflow to Conditional Execution of job in parent caller workflow
+
+**Critical Insight**: In order to get the output from the reusable workflow to
+run the job conditionally in parent caller workflow we have to follow:
+
+- **The Chain**: Step Output → Job Output → Workflow Output → Parent
+  Conditional.
+
+* Code snippet for the implementation inside reusable
+  workflow(.github/workflows/filter-changes.yml)
+
+**Step level**
+
+```yaml
+jobs:
+  filter-changes:
+    steps:
+      - id: check-changes
+        run: echo "has_changes=true" >> $GITHUB_OUTPUT
+```
+
+**Job level**
+
+```yaml
+jobs:
+  filter-changes:
+    outputs:
+      has_relevant_changes: ${{ steps.check-changes.outputs.has_changes }}
+```
+
+**Workflow level**
+
+```yaml
+on:
+  workflow_call:
+    outputs:
+      has_relevant_changes:
+        value: ${{ jobs.filter-changes.outputs.has_relevant_changes }
+```
+
+- Code snippet for the implementation inside parent workflow for conditional
+  execution (.github/workflows/ci.yml)
+
+```yaml
+jobs:
+  test-and-build:
+    needs: filter-changes
+    if: needs.filter-changes.outputs.has_relevant_changes == 'true'
+```
+
+output flow:
+
+```mermaid
+graph LR
+
+subgraph Reusable Workflow
+  A1["Step: echo 'has_changes=true' >> \$GITHUB_OUTPUT"] --> A2["Job Output: steps.<step_id>.outputs.has_changes"]
+  A2 --> A3["Reusable Workflow Output: jobs.<job_id>.outputs.has_changes"]
+end
+
+subgraph Caller Workflow
+  A3 --> B1["needs.<reusable_job_id>.outputs.has_changes"]
+end
+
+```
+
+> the full implementation of the output flow is shown under "3. change detection
+> in the files" below
+
+### 3. Change Detection in the files
 
 **Problem**: GitHub's native `paths` filter works fine on normal pushes but not
 reliable on force pushes, rollbacks, and rebases.
 
-**Solution**: Custom git diff with explicit commit comparison:
+**Solution**: Custom git diff with explicit commit comparison
+
+**Implementation**: ( this snippet also has full implementation output flow)
 
 ```yaml
 # normally try this solution initially to detect changes it will work fine on normal pushes but on rollbacks, rebases, resets it may or may not work reliably
+# implementing this solution will not require the implementation of the alternative filter-changes job
+# in order to make this solution work write branches and paths in the same order to below
 # .github/workflows/ci.yml
 on:
   push:
@@ -87,7 +238,7 @@ on:
       - '**/yarn.lock'
       - '**.*rc'
       - '**.yml'
-# then alternatively try this solution which will reliably work on any solution
+# if paths filter solution doesn't work then alternatively try this solution which will reliably work on any cases
 # .github/workflows/ci.yml
 on:
   push:
@@ -160,7 +311,7 @@ jobs:
 - **Targeted file filtering** focuses on files that actually affect builds
 - **Performance impact**: 80% reduction in unnecessary job runs
 
-### 2. Advanced Caching Strategy: From 110MB to 17MB
+### 4. Advanced Caching Strategy: From 110MB to 17MB
 
 **The Problem with Yarn Cache:** Even with Yarn's global cache, you still need
 to:
@@ -214,108 +365,12 @@ to:
 - **Deterministic restoration**: No package resolution overhead and linking
   dependencies
 
-### 3. The Secret Passing Chain: Understanding GitHub Actions Security
-
-**Critical Insight**: GitHub Actions has strict security isolation:
-
-- Reusable workflows DON'T inherit secrets from callers
-- Composite actions NEVER see secrets implicitly
-- All secret passing must be explicit
-
-**Implementation Pattern:**
-
-```yaml
-# Parent workflow (.github/workflows/ci.yml)
-jobs:
-# This job runs tests and builds the project.
-  test-and-build:
-    # Reuses a separate workflow file for the test and build logic.
-    uses: ./.github/workflows/test_and_build.yml
-    # passing the secrets into reusable workflow
-    secrets:
-      secret_GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-# Reusable workflow (.github/workflows/test-build.yml)
-name: Lint, Test, and Build
-
-# This defines the workflow as a reusable workflow that can be called by other workflows.
-on:
-  workflow_call:
-    # Specifies the secrets that must be passed in when this workflow is called.
-    secrets:
-      secret_GITHUB_TOKEN:
-        required: true
-
-jobs:
-  test-build:
-    - name: Setup, install, lint, test and build code
-      # This step calls a custom composite action located in the local repository.
-      # This promotes code reuse and keeps the main workflow file clean.
-      uses: ./.github/actions/test_and_build
-      with:
-        # Passes the required secret to the reusable action.
-        secret_input_github_token: ${{secrets.secret_GITHUB_TOKEN}}
-
-# Composite action (.github/actions/test_and_build/action.yml)
-# Defines the inputs that this action accepts.
-inputs:
-  secret_input_github_token:
-    required: true
-
-# Specifies that this is a composite run action, which combines multiple steps into a single reusable action.
-runs:
-  using: 'composite'
-  steps:
-      # This action generates a code coverage report and adds it as a comment on the pull request.
-    - name: Generate coverage report
-      uses: ArtiomTr/jest-coverage-report-action@v2
-      with:
-        github-token: ${{ inputs.secret_input_github_token }}
-```
-
-> these are just the some important snippets from the code for full code review
-> visit the repo at:
-> https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
-
-### 4. Output Flow: From Steps in reusable workflow to Conditional Execution of job in parent caller workflow
-
-In order to get the output from the reusable workflow to run the job
-conditionally in parent caller workflow we have to follow:
-
-- **The Chain**: Step Output → Job Output → Workflow Output → Parent Conditional
-
-```yaml
-# .github/workflows/filter-changes.yml
-
-# Step level
-- id: check-changes
-  run: echo "has_changes=true" >> $GITHUB_OUTPUT
-
-# Job level
-jobs:
-  filter-changes:
-    outputs:
-      has_relevant_changes: ${{ steps.check-changes.outputs.has_changes }}
-
-# Workflow level
-on:
-  workflow_call:
-    outputs:
-      has_relevant_changes:
-        value: ${{ jobs.filter-changes.outputs.has_relevant_changes }}
-
-# Parent conditional execution (.github/workflows/ci.yml)
-jobs:
-  test-and-build:
-    needs: filter-changes
-    if: needs.filter-changes.outputs.has_relevant_changes == 'true'
-```
-
-> these are just the some important snippets from the code for full code review
-> visit the repo at:
-> https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
-
 ### 5. Artifact Management: Efficient Job-to-Job Data Transfer
+
+**Problem**: every job in github actions run in a separate fresh container and
+do not implicitly inherit any files from the previous job **Solution**: pass the
+relevant files as an artifact between jobs by uploading and downloading
+artifacts
 
 ```yaml
 # Producer job
@@ -334,6 +389,7 @@ jobs:
   with:
     name: dist
     path: dist/
+    if-no-files-found: error
 ```
 
 > these are just the some important snippets from the code for full code review
@@ -344,6 +400,7 @@ jobs:
 
 - Use unique artifact names (`build-${{ github.sha }}`)
 - Set appropriate retention periods
+- throw error when files are not found
 - Include all necessary files for downstream jobs
 
 ## Performance Optimization Results
