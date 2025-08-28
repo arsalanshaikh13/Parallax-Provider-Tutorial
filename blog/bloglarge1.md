@@ -82,7 +82,8 @@ jobs:
 
   # This job runs tests and builds the project.
   test-and-build:
-    # Grants necessary permissions for the test_and_build job to write checks and reports.
+    # Grants necessary permissions for the test_and_build job to write on test coverage on Pull request as per artiomTr/ documenation.
+    # https://github.com/ArtiomTr/jest-coverage-report-action?tab=readme-ov-file#pull-request-number
     permissions:
       checks: write
       pull-requests: write
@@ -107,6 +108,8 @@ jobs:
   test_and_build job is skipped.
 - we will talk about
 - secrets is being passed to test_and_build job under secrets key
+- permissions grant the write permission for checks, pull-requests and contents
+  in order to publish jest coverage on Pull request
 
 ---
 
@@ -413,3 +416,28 @@ Stay tuned—or better, ⭐ the repo and follow along.
 👉 Do you want me to **continue with Part 2 (cache + artifacts)** in the same
 detailed blog style, so you can assemble them later into a full flagship post or
 series?
+
+thing to put in the blog: design decisions lessons learned, key insights, what
+worked well performance metrics best practices and recommendation and gotchas
+limitations of scope of the project
+
+the learning challenge the problems i encountered my learning approach
+documentation, learning from hands on experience through reading job logs on
+github actions using ai to understand technicalities of job logs and errors and
+to understand the solution i proposed/found
+
+analyze the readme, point out/identify(infer whererever possible if not
+explicitly mentioned) the key insights, lessons i learned, my learning approach,
+design decisions and reasoning /justiifications for using specific components in
+the architecture and tradeoffs considered, develop a how to guide for developing
+pipeline using github actions which involves features like modular architecutre
+(layout, flow chart, components with purpose and benefit) ,using git diff and
+fetching just last 2 commit detecting relevant changes in files for branch and
+tag push,secrets and inputs passing between workflows/actions , outputs passing
+from steps to jobs to workflow_calls to caller workflow through needs in order
+to conditionally execute job on relevant file changes, caching - saving and
+restoring between multiple jobs, uploading and downloading artifacts between
+jobs,highlight impactful metrics and insights and innovations and best practices
+and recommendations, develop a how to guide in a blog post from the readme
+aiming to guide my fellow developers as well justify my project for senior
+developers and hiring managers
