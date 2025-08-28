@@ -163,20 +163,22 @@ graph LR
     error.
 
 - **Solutions applied:**
-  - Use **quoted heredocs** with no indentation:
+  - put the shell script into a separate generate-pipeline.sh file
+  - Use **heredocs** with no indentation inside the file:
 
     ```sh
-    cat <<'YAML' > .gitlab/pipeline-config.yml
+    cat > .gitlab/pipeline-config.yml << EOF
     include:
       - local: '.gitlab/child-full.yml'
-    YAML
+    EOF
     ```
 
-  - Ensure scripts are executable **and** LF line endings:
+  - Ensure scripts are executable and run using shell this takes LF line endings
+    as shell scripts can ran seamlessly on alpine images
 
     ```sh
     chmod +x .gitlab/generate-pipeline.sh
-    sed -i 's/\r$//' .gitlab/generate-pipeline.sh  # or dos2unix
+    sh .gitlab/generate-pipeline.sh
     ```
 
   - Trigger child pipeline correctly from the parent job:
@@ -201,7 +203,6 @@ graph LR
 - **Cause:** Default artifact dependency behavior (or `needs:` without
   `artifacts: false`).
 - **Solutions:**
-  - `dependencies: []` **or**
   - `needs: [ { job: lint_and_test, artifacts: false } ]`
 
 - **Impact:** Faster jobs, less network churn, cleaner pipeline.
