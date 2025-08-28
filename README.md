@@ -438,15 +438,26 @@ on Pull Request and Job summary
 
 ### Key insights on Some key issues
 
-1. **Permission Inheritance Problems**:
-   - **Fundamental Understanding**: GitHub Actions has strict permission
-     isolation between workflow components
-   - **Core Insight**: Reusable workflows don't inherit permissions from
-     parents; composites don't inherit secrets
-   - **Solution Pattern**: Explicit permission declaration at each reusable
-     workflow
+1. **Intercommunication between jobs**:
+   - **No implicit communication**:Every job runs on its own separate isolated
+     container not knowing implicity the state of other jobs, so files and
+     parameters are not share implicitly,
+   - **explicit communication**so we need to explictly pass files, parameters,
+     variables as artifacts for files and inputs and outputs for parameters and
+     variables between jobs jobs run in parallel by default, in order to
+     sequentially run the jobs set dependency on the dependent job using
+     `needs:<job>`
 
-2. **Cache Optimization**:
+2. **permissions management**:
+   - **role of workflows**: reusable workflow content gets pulled in the caller
+     workflow during execution, so reusable workflow is the executor of the job,
+     but caller workflow is orchestrator
+   - **where to set permissions?**: only the permissions set in caller workflow
+     can affect the pipeline since the reusable workflow is called by the caller
+     workflow even though the execution code might by in the reusable workflow
+     in order to write test coverage report on Pull request and job summary set
+     the permission in the parent workflow
+3. **Cache Optimization**:
    - **Deep Analysis**: Yarn's global cache is a much bigger file still requires
      installing and linking dependencies to match cache with specific node
      version
@@ -455,14 +466,17 @@ on Pull Request and Job summary
    - **Architecture Impact**: Cache strategy affects both performance and
      reliability
 
-3. **Change Detection Reliability for tag push**:
-   - **Git Complexity**: Shallow clones and merge base calculation are
-     notoriously tricky in CI environments especially for rollbacks for tags
-   - **Solution Strength**: keep fetch-depth 2 to compare parent commit with
-     current commit using git diff, in case of rollbacks first force push the
-     previous commit, then push the new commit which has the tag version in it
+4. **Change Detection Reliability for tag push**:
+   - **Git Complexity**: git by default fetches only single commit, which makes
+     it impossible for git diff to compare the commits to detect file changes
+     for tags, and also tag delete from origin doesn't remove the commit from
+     the origin, to remove the commit from the origin we need to force push
+     previous or other commit
+   - **Solution**: keep fetch-depth 2 to compare parent commit with current
+     commit using git diff, in case of rollbacks first force push the previous
+     commit, then push the new commit which has the tag version in it
 
-4. **Secrets Inheritance Problems in composite actions**:
+5. **Secrets Inheritance Problems in composite actions**:
    - **Behavior**: Composite actions don't inherit secrets context
    - **Reason**: composite actions are meant to be reused across multiple
      repositories which makes secrets inheritance management complicated
@@ -472,16 +486,16 @@ on Pull Request and Job summary
 
 ## Lessons Learned
 
-1. **Modularize early**: Reusable workflows + composite actions keep CI easy to
-   reason about.
-2. **Be explicit with secrets/permissions**: GitHub Actions won’t implicitly
-   pass them to reusables/composites.
-3. **Measure, then optimize**: Switching to `node_modules` cache provided real
-   speed + size wins here.
-4. **Surface developer feedback**: Coverage in PRs changes behavior—developers
-   respond to what they can see.
-5. **Guard the mainline**: Required status checks protect release quality with
-   minimal friction.
+1. **Modularize early** → It pays off before pipelines get out of hand.
+2. **Explicit communication**: Be explicit with passing inputs, outputs, secrets
+   and files → GitHub Actions won’t assume it for you.
+3. **hierarchial output retreival**:in order to use outputs from the other
+   workflows or jobs we have to retrieve it hierarchically
+4. **Measure, then optimize** → measuring the performance of pipeline through
+   time taken and size of files, can help in devising the strategy for optimized
+   execution by identifying repeatable pat
+5. **Protect your main branch** → Required status checks in Pull request avoid
+   bug filled code to pass in the main thus keeping quality high.
 
 **Tech Stack**: GitHub Actions, Node.js, git, YAML, Shell Scripting  
 **Skills Demonstrated**: DevOps Architecture, Performance Optimization,
@@ -497,7 +511,3 @@ Developer Experience
 #### <p align="right">(<a style="cursor:pointer" href="#readme-top">back to top</a>)</p>
 
 ---
-
-outline for blog - for future blog creation savig blog in md file , blog
-folder - blog outline, blog prompts outline for readme - for future readme
-creation table of contents key architectural/design decisions and tradeoffs

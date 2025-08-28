@@ -1,4 +1,4 @@
-# Building Production-Grade GitHub Actions Pipelines: A Complete Developer's Guide
+# Building GitHub Actions Pipelines: A Complete Developer's Guide
 
 ## Introduction
 
@@ -13,6 +13,13 @@ performance optimizations, and critical insights I discovered along the way.
 - Advanced techniques for change detection, caching, and secret management
 - Performance optimizations that reduced our pipeline time by 47%
 - Production-ready patterns used by enterprise teams
+
+## About This Guide
+
+This Guide demonstrates GitHub Actions CI patterns using a JavaScript project as
+an example. All project related configurations are framework-agnostic and can be
+adapted to any tech stack by substituting the relevant commands and file
+patterns shown throughout.
 
 ## The Problem: When Monolithic Workflows Break Down
 
@@ -64,7 +71,7 @@ jobs:
 | **Reusable Workflows** | Clean separation of concerns; isolated, testable pipeline stages                                                    | Consistent and easier reuse across repos |
 | **Composite Actions**  | Share repeatable step blocks (e.g., checkout, Node setup, cache storing/retrieving, test, build, artifact handling) | Reduced duplication                      |
 
-#### 💡 Why Modular Workflows Matter
+#### Why Modular Workflows Matter
 
 - **Maintainability** → clear separation of concerns to monitor and fix relevant
   pieces in their respective workflow or actions in isolation without searching
@@ -76,9 +83,7 @@ jobs:
 
 ## Implementation Deep Dive
 
-### 1. The Secret and input Passing Chain: Understanding GitHub Actions communication
-
-**Critical Insight**: GitHub Actions has strict security isolation:
+### 1. Understanding GitHub Actions communication between jobs
 
 - Reusable workflows DON'T inherit secrets from callers
 - Composite actions NEVER see secrets implicitly
@@ -146,8 +151,8 @@ runs:
 
 ### 2. Output Flow: From Steps in reusable workflow to Conditional Execution of job in parent caller workflow
 
-**Critical Insight**: In order to get the output from the reusable workflow to
-run the job conditionally in parent caller workflow we have to follow:
+In order to get the output from the reusable workflow to run the job
+conditionally in parent caller workflow we have to follow:
 
 - **The Chain**: Step Output → Job Output → Workflow Output → Parent
   Conditional.
@@ -194,7 +199,7 @@ jobs:
     if: needs.filter-changes.outputs.has_relevant_changes == 'true'
 ```
 
-output flow:
+output flow chart:
 
 ```mermaid
 graph LR
@@ -231,6 +236,7 @@ on:
   push:
     branches:
       - main
+    # ADAPT THIS: Replace extensions with your own project's  relevant file extensions
     paths:
       - '**.json'
       - '**.js'
@@ -285,6 +291,7 @@ jobs:
           set +e
           # Uses 'git diff' to find the names of files that have changed between the current and previous commit.
           # The output is piped to 'grep' to filter for specific file extensions like .js, .json, etc.
+          # ADAPT THIS: Replace extensions with your own project's  relevant file extensions
           changed_files=$(git diff --name-only  HEAD^ ${{ github.sha }} 2>&1 | grep -E '\.js$|\.json$|\.yml$|\.lock$|\..*rc$')
           echo $changed_files output
           # An 'if' condition checks if the 'changed_files' variable is not empty.
@@ -303,7 +310,18 @@ jobs:
 > visit the repo at:
 > https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
 
-**Why the alternate solution Works:**
+**what is happening**:
+
+- checkout only fetches current and previous commits
+- git diff comparent current commit and previous commit and its output is piped
+  to grep which check for files extension pattern and output of grep is stored
+  in `changed_files` variable
+- the if condition checks if `changed_files` , based on whether `changed_files`
+  is empty or not, hen `has_changes` is set true or false ,which is stored in
+  `$GITHUB_OUTPUT`
+- the output flow is explained the 'Output flow' section above
+
+**Why the alternate solution Works**
 
 - **Explicit commit comparison** handles all git scenarios (rollbacks, force
   pushes, rebases)
@@ -328,13 +346,16 @@ to:
 - name: Get node_modules
   # The 'actions/cache' action handles caching and restoring files.
   uses: actions/cache@v4
+  # id name can be anything
   id: node_modules
   with:
     # The path to the directory that will be cached.
+    # ADAPT THIS: Replace paths with your own project's  relevant file paths
     path: |
       **/node_modules
     # The cache key is generated from the runner's OS, a fixed string, and a hash of the 'yarn.lock' file and node version used.
     # This ensures the cache is unique to the dependencies and the runner environment.
+    # ADAPT THIS: Replace node-modules and node version with your own project's  relevant names ids or any names for key generation
     key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}-v18.20.8
 
 # This step only runs if the cache was not found in the previous step.
@@ -357,7 +378,9 @@ to:
 
 - the actions/cache saves and restore the node modules cache
 - the setup node and installing dependencies steps only run when the cache is
-  not found **Performance Results:**
+  not found
+
+**Performance Results:**
 
 - **Cache size**: 110MB → 17MB (85% reduction)
 - **Install time**: 17s → 9s (47% improvement) as install step is completely
@@ -377,7 +400,7 @@ artifacts
 - name: Upload build artifacts
   uses: actions/upload-artifact@v4
   with:
-    name: build-${{ github.sha }}
+    name: dish
     path: |
       dist/**
     if-no-files-found: error
@@ -388,7 +411,7 @@ artifacts
   uses: actions/download-artifact@v4
   with:
     name: dist
-    path: dist/
+    path: dist/**
     if-no-files-found: error
 ```
 
@@ -396,12 +419,51 @@ artifacts
 > visit the repo at:
 > https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
 
-**Best Practices:**
+**what is happening**
 
-- Use unique artifact names (`build-${{ github.sha }}`)
+- Use artifact names to access the artifacts
 - Set appropriate retention periods
 - throw error when files are not found
-- Include all necessary files for downstream jobs
+- `dist/**` include all files from current and subdirectory as well for
+  downstream jobs
+
+### 6. Jest Coverage reporting on PR and Job summary
+
+**Problem**:
+
+- test coverage was only locally available for review
+- needed to scan jobs log to see the test coverage.
+
+**Solution implementation**:
+
+```yaml
+- name: Jest Coverage Comment
+    id: coverage
+    uses: ArtiomTr/jest-coverage-report-action@v2
+    with:
+      github-token: ${{ inputs.secret_input_github_token }}
+      annotations: all # show all the errors on job summary
+      skip-step: all # just utilize the test coverage instead of running test here
+      coverage-file: ${{github.workspace}}/coverage/report.json
+      base-coverage-file: ${{github.workspace}}/coverage/report.json
+      output: comment, report-markdown
+      icons: emoji
+
+- name: Check the output coverage
+      run: |
+        echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+        ${{ steps.coverage.outputs.report }}
+        EOF
+      shell: bash
+      if: always() # show the error reporting as well
+
+```
+
+**what is happening**: it takes the test coverage generated during test and
+organized and beautifies and transforms into usable markdown format to be shown
+on Pull Request and Job summary
 
 ## Performance Optimization Results
 
@@ -425,88 +487,133 @@ artifacts
 - **Clear pipeline status** with descriptive job names
 - **Protected branches** with required status checks
 
-## Critical Insights & Lessons Learned
+## Critical Insights
 
-### 1. GitHub Actions Security Model
+1. **Intercommunication between jobs**:
+   - **No implicit communication**:Every job runs on its own separate isolated
+     container not knowing implicity the state of other jobs, so files and
+     parameters are not share implicitly,
+   - **explicit communication**so we need to explictly pass files, parameters,
+     variables as artifacts for files and inputs and outputs for parameters and
+     variables between jobs jobs run in parallel by default, in order to
+     sequentially run the jobs set dependency on the dependent job using
+     `needs:<job>`
 
-**Key Learning**: Security isolation is by design, not by accident.
+2. **permissions management**:
+   - **role of workflows**: reusable workflow content gets pulled in the caller
+     workflow during execution, so reusable workflow is the executor of the job,
+     but caller workflow is orchestrator
+   - **where to set permissions?**: only the permissions set in caller workflow
+     can affect the pipeline since the reusable workflow is called by the caller
+     workflow even though the execution code might by in the reusable workflow
+     in order to write test coverage report on Pull request and job summary set
+     the permission in the parent workflow
+3. **Cache Optimization**:
+   - **Deep Analysis**: Yarn's global cache is a much bigger file still requires
+     installing and linking dependencies to match cache with specific node
+     version
+   - **Performance Truth**: node_modules caching provides more deterministic
+     restoration in further pipeline runs
+   - **Architecture Impact**: Cache strategy affects both performance and
+     reliability
 
-- Explicit permission declaration at every level
-- Secret passing must be intentional and documented
-- Minimal required permissions principle
+4. **Change Detection Reliability for tag push**:
+   - **Git Complexity**: git by default fetches only single commit, which makes
+     it impossible for git diff to compare the commits to detect file changes
+     for tags, and also tag delete from origin doesn't remove the commit from
+     the origin, to remove the commit from the origin we need to force push
+     previous or other commit
+   - **Solution**: keep fetch-depth 2 to compare parent commit with current
+     commit using git diff, in case of rollbacks first force push the previous
+     commit, then push the new commit which has the tag version in it
 
-### 2. Performance Optimization Strategies
+5. **Secrets Inheritance Problems in composite actions**:
+   - **Behavior**: Composite actions don't inherit secrets context
+   - **Reason**: composite actions are meant to be reused across multiple
+     repositories which makes secrets inheritance management complicated
+   - **Solution**: pass the secrets as input variable
 
-**Critical Insight**: Measure before optimizing.
+## Lessons Learned
 
-- node_modules caching beats global package caches for deterministic builds
-- Change detection saves more resources than any other optimization
-- Cache key strategy directly impacts hit rates
+1. **Modularize early** → It pays off before pipelines get out of hand.
+2. **Explicit communication**: Be explicit with passing inputs, outputs, secrets
+   and files → GitHub Actions won’t assume it for you.
+3. **hierarchial output retreival**:in order to use outputs from the other
+   workflows or jobs we have to retrieve it hierarchically
+4. **Measure, then optimize** → measuring the performance of pipeline through
+   time taken and size of files, can help in devising the strategy for optimized
+   execution by identifying repeatable pat
+5. **Protect your main branch** → Required status checks in Pull request avoid
+   bug filled code to pass in the main thus keeping quality high.
 
-### 3. Architecture Decision Framework
-
-**Decision Process**: Always ask "What problem does this solve?"
-
-- **Modular design** → Maintainability and reusability
-- **Explicit communication** → Security and predictability
-- **Conditional execution** → Performance and cost optimization
+---
 
 ### Common Issues and Root Causes
 
-| Error                    | Root Cause                              | Solution                                       |
-| ------------------------ | --------------------------------------- | ---------------------------------------------- |
-| `secrets.X not found`    | Composite actions don't inherit secrets | Pass via inputs explicitly                     |
-| Coverage not in PR       | Missing write permissions               | Add `permissions:` to caller workflow          |
-| Change detection fails   | Shallow clone issues                    | Use `fetch-depth: 2`                           |
-| Tag push rollback issues | Git tag references persist              | Force reset → push previous → new commit + tag |
+| Error                                                            | Why it happens                                                                                     | Fix                                                                                                                                                |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `secrets.X not found` in composite action                        | Composite actions don’t inherit secrets                                                            | Pass via action `inputs`; forward from caller → reusable → action                                                                                  |
+| Change filter never matches                                      | Wrong merge base or shallow clone                                                                  | Use `fetch-depth: 2` to checkout code to make git diff work and compare proper parent commit SHA with current commit SHA                           |
+| git tag push for same tag doesn't get recognized after rollbacks | git keeps the tag reference commit even after deleting the tag since it is still the latest commit | after deleting the tag first reset hard to previous commit then force push the previous commit and the push the new commit with the same tag again |
 
 ## Best Practices & Recommendations
 
-### Architectural Guidelines
+- **Folder rules**
+  - Reusable workflows **must** live in `.github/workflows`.
+  - Composite actions live in `.github/actions/<name>/action.yml` (or a
+    dedicated repo—**one action per repo** when published).
 
-1. **Modularize Early**: Start with reusable components from day one
-2. **Be Explicit**: Never rely on implicit behavior for secrets/permissions
-3. **Measure Impact**: Quantify optimizations with real metrics
-4. **Guard Quality**: Use required status checks on protected branches
+- **Always call modular parts with `uses:`**; keep business logic out of the
+  driver file.
+- **Secrets & permissions**
+  - Reusable workflows **do not inherit** secrets/permissions; define them in
+    the **caller**.
+  - Composite actions **never** see `secrets` implicitly—pass them as inputs.
 
-### Performance Optimization
+- **Outputs plumbing**
+  - Step `echo "output=<something>">> $GITHUB_OUTPUT` → Job
+    (`outputs:steps.<step-id>.outputs.*`) → Reusable workflow
+    (`outputs:jobs.<job>.outputs.*`) → Parent (`needs.<job>.outputs.*`).
 
-1. **Cache Strategy**: Choose caching approach based on your dependency
-   management
-2. **Change Detection**: Implement smart filtering for relevant files
-3. **Parallel Execution**: Use job dependencies strategically
-4. **Resource Management**: Set appropriate artifact retention periods
+- **Status checks**
+  - Protect `main`: require **Test CI** to pass before merging PRs.
 
-### Security Considerations
+- **Performance**
+  - Prefer `node_modules` cache for this repo over Yarn global cache.
+  - Keep `fetch-depth: 2` for robust diffs for repeated rollbacks .
 
-1. **Minimal Permissions**: Grant only what each component needs
-2. **Explicit Secret Flow**: Document and validate secret passing chains
-3. **Regular Audits**: Review permissions and access patterns periodically
+- **Artifacts**
+  - Use `upload-artifact` / `download-artifact` to avoid rebuilding between
+    jobs.
+- **Cache key**
+  - Use `cache key` for faster, successful and secure saving and retriving the
+    caches for node modules and yarn packages and since the hash key is based on
+    yarn.lock file check for changes in the dependencies between the builds
+- **Resetting tags for rollbacks**
+  - after deleting the tag, always reset hard to previous commit and then force
+    push previous commit, then create the new commit+tag using npm version patch
+    and then successfully push the same tag again, this way we can push tags
+    with just fetching previous 2 commits only instead of fetching full git
+    history
 
 ## Conclusion
 
-This modular GitHub Actions architecture transformed our development workflow
+This modular GitHub Actions architecture transformed the development workflow
 from a maintenance burden into a competitive advantage. The key insights:
 
-1. **Architecture Matters**: Modular design enables scalability and
-   maintainability
-2. **Performance Optimization**: Measured improvements deliver real value
-3. **Security by Design**: Explicit patterns prevent common vulnerabilities
-4. **Developer Experience**: Good tooling improves team productivity
-
-The patterns demonstrated here scale from personal projects to enterprise
-environments, providing a foundation for production-grade CI/CD pipelines.
-
-## Technical Skills Demonstrated
-
-- **Advanced GitHub Actions**: Workflow orchestration, reusable components,
-  security patterns
-- **Performance Engineering**: Cache optimization, conditional execution,
-  resource management
-- **DevOps Architecture**: Modular system design, pipeline optimization
-- **Problem Solving**: Root cause analysis, systematic debugging approaches
-- **Documentation**: Technical communication, knowledge transfer
+- **Architecture Matters**: Modular design enables scalability and
+  maintainability
+- **Developer happiness** → less waiting, more coding.
+- **Technical impact** → fewer wasted runs, better resource usage.
 
 This implementation showcases the ability to design, optimize, and maintain
-complex CI/CD systems that deliver measurable business value while maintaining
+complex CI/CD systems that deliver measurable technical value while maintaining
 security and reliability standards.
+
+## Reminder:
+
+The scope of this blog covers only about the ci implementation of my project
+parallax-provider-tutorial, so feel free to use the yml code for the ci
+implementation replacing my project related code with your own app's code, this
+yml configuration works generally on any project's ci implementation by just
+substituting the relevant parts of your code in the yml file
