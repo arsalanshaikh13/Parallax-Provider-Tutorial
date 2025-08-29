@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Github repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1 # sending previous 2 commits to avoid shallow commit error
+          fetch-depth: 2 # sending previous 2 commits to avoid shallow commit error and make git rev-parse work in gitlab-sync-and-trigger.sh file
 
       - name: Push to Gitlab and Trigger GitLab Pipeline
         run: bash ./ci-scripts/gitlab-sync-and-trigger.sh
