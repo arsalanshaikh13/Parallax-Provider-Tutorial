@@ -35,6 +35,8 @@ else
     #     -H "Content-Type: application/json" \
     #     -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"COMMIT_BEFORE_SHA_HERE\"}]}" \
     #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+
+    # https://docs.gitlab.com/ci/triggers/ 
     curl -v --request POST \
         --form token=${GITLAB_TRIGGER_TOKEN} \
         --form ref=${GITLAB_BRANCH} \
