@@ -10,11 +10,11 @@ workflow:
         '($CI_COMMIT_BRANCH == "gitlabci" || $CI_COMMIT_TAG) &&
         $CI_PIPELINE_SOURCE == "api"'
       # check for changes in the file extension to run the pipeline
-      # changes:
-      #   - '**.js'
-      #   - '**.json'
-      #   - '**.*rc'
-      #   - '**.yml'
+      changes:
+        - '**.js'
+        - '**.json'
+        - '**.*rc'
+
     - when: never # do not run pipeline on any other condition
 
 stages:
