@@ -15,13 +15,20 @@ if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
     echo "Waiting for GitLab to register the tag..."
     LATEST_TAG="${GITHUB_REF#refs/tags/}"
     git push  gitlab $LATEST_TAG
-    sleep 5
+    sleep 2
     echo "Triggering Gitlab pipeline on tag push..."
-    curl -X POST \
-        -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
-        -H "Content-Type: application/json" \
-        -d "{\"ref\":\"$LATEST_TAG\"}" \
-        "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+    # curl -X POST \
+    #     -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
+    #     -H "Content-Type: application/json" \
+    #     -d "{\"ref\":\"$LATEST_TAG\"}" \
+    #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+
+    # https://docs.gitlab.com/ci/triggers/ 
+    curl -v --request POST \
+        --form token=${GITLAB_TRIGGER_TOKEN} \
+        --form ref=$LATEST_TAG \
+        --form "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
+        "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline"
 
 else
     echo "No tags found"
