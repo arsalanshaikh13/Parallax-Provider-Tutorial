@@ -16,7 +16,14 @@ jobs:
       - name: Checkout Github repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # sending previous 2 commits to avoid shallow commit error and make git rev-parse work in gitlab-sync-and-trigger.sh file
+          # setting fetch-depth:5 as buffer to provide the commits from the latest commit to previous successful pushed
+          # since my last 2 pushes on github action failed gitlab didn't get the last 2 commits
+          # actuall gitlab wants to sync the github repo with gitlab repo so keep the fetch-depth equivalent to no of commits pushing to github actions for build
+          # if we are frequently pushing to github then fetch-depth 2 will work (to make git rev-parse also work)
+          # if we are pushing to github after every 10 commits then fetch-depth should be 10 (assuming there were no errors in github actions)
+          # if there were error in github actions then we have to account for that commit
+          # keeping all this in mind we have to set fetch-depth value
+          fetch-depth: 5 # sending previous 5 commits to avoid shallow commit error and make git rev-parse work in gitlab-sync-and-trigger.sh file
 
       - name: Push to Gitlab and Trigger GitLab Pipeline
         run: bash ./ci-scripts/gitlab-sync-and-trigger.sh
