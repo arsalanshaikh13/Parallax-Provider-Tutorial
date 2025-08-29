@@ -15,8 +15,8 @@ jobs:
     steps:
       - name: Checkout Github repo
         uses: actions/checkout@v3
-        # with:
-        #   fetch-depth: 0 # clone full history, avoids shallow push rejection
+        with:
+          fetch-depth: 2 # clone full history, avoids shallow push rejection
 
       - name: Push to Gitlab and Trigger GitLab Pipeline
         run: bash ./ci-scripts/gitlab-sync-and-trigger.sh
