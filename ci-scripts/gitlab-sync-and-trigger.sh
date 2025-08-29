@@ -30,7 +30,7 @@ else
 
     echo "Triggering Gitlab pipeline on branch push..."
     # https://docs.gitlab.com/api/pipelines/#:~:text=Basic%20example:,/projects/1/pipeline?
-    curl -X POST \
+    curl -v -X POST \
         -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
         -H "Content-Type: application/json" \
         -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"$PREVIOUS_COMMIT\"}]}" \
