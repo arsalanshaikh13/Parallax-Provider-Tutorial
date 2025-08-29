@@ -30,10 +30,16 @@ else
 
     echo "Triggering Gitlab pipeline on branch push..."
     # https://docs.gitlab.com/api/pipelines/#:~:text=Basic%20example:,/projects/1/pipeline?
+    # curl -X POST \
+    #     -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
+    #     -H "Content-Type: application/json" \
+    #     -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"COMMIT_BEFORE_SHA_HERE\"}]}" \
+    #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
     curl -X POST \
-        -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
-        -H "Content-Type: application/json" \
-        -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"COMMIT_BEFORE_SHA_HERE\"}]}" \
-        "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+        -F token=${GITLAB_TRIGGER_TOKEN} \
+        -F ref=${GITLAB_BRANCH} \
+        -F "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
+        "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline"
+
 fi
 

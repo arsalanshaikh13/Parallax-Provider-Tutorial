@@ -21,6 +21,7 @@ jobs:
       - name: Push to Gitlab and Trigger GitLab Pipeline
         run: bash ./ci-scripts/gitlab-sync-and-trigger.sh
         env:
+          GITLAB_TRIGGER_TOKEN: ${{ secrets.GITLAB_TRIGGER_TOKEN }} # gitlab personal access token with api write and read repository scope to set variables
           GITLAB_PUSH_TOKEN: ${{ secrets.GITLAB_PUSH_TOKEN }} # gitlab personal access token with write and read repository scope
           GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}
           GITLAB_BRANCH: ${{ secrets.GITLAB_BRANCH }}
