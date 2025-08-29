@@ -4,7 +4,8 @@ set -e
 
 echo "Adding Gitlab remote"
 echo "$GITHUB_REF_TYPE  is github_ref_type and $GITHUB_REF  is github_Ref and ${GITHUB_REF#refs/tags/}"
-
+# https://docs.gitlab.com/topics/git/troubleshooting_git/#error-on-git-fetch-http-basic-access-denied
+git config --global user.name "arsalanshaikh13"
 git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
 PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
 echo "COMMIT_BEFORE_SHA: $PREVIOUS_COMMIT"
