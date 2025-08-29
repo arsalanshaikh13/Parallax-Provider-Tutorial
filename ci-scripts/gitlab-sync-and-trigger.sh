@@ -33,7 +33,7 @@ else
     curl -v -X POST \
         -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
         -H "Content-Type: application/json" \
-        -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\",\"variable_type\": \"string\", \"value\":\"$PREVIOUS_COMMIT\"}]}" \
+        -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"$PREVIOUS_COMMIT\"}]}" \
         "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
 
     # https://docs.gitlab.com/ci/triggers/ 
