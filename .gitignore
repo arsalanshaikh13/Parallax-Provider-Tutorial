@@ -8,3 +8,5 @@ dummy-file.js
 Gemini-Husky, Eslint, Prettier Integration Guide.md
 .travis.yml
 ci_build.yml
+curl.sh
+*.txt
