@@ -26,7 +26,7 @@ if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
 else
     echo "No tags found"
     echo " pushing latest commit GitHub code to GitLab..."
-    git push  gitlab HEAD:${GITLAB_BRANCH}
+    git push --force gitlab HEAD:${GITLAB_BRANCH}
 
     echo "Triggering Gitlab pipeline on branch push..."
     # https://docs.gitlab.com/api/pipelines/#:~:text=Basic%20example:,/projects/1/pipeline?
