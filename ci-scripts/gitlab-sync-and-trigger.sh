@@ -30,18 +30,18 @@ else
 
     echo "Triggering Gitlab pipeline on branch push..."
     # https://docs.gitlab.com/api/pipelines/#:~:text=Basic%20example:,/projects/1/pipeline?
-    # curl -X POST \
-    #     -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
-    #     -H "Content-Type: application/json" \
-    #     -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"COMMIT_BEFORE_SHA_HERE\"}]}" \
-    #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
+    curl -X POST \
+        -H "PRIVATE-TOKEN: ${GITLAB_PAT}" \
+        -H "Content-Type: application/json" \
+        -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"$PREVIOUS_COMMIT\"}]}" \
+        "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
 
     # https://docs.gitlab.com/ci/triggers/ 
-    curl -v --request POST \
-        --form token=${GITLAB_TRIGGER_TOKEN} \
-        --form ref=${GITLAB_BRANCH} \
-        --form "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
-        "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline"
+    # curl -v --request POST \
+    #     --form token=${GITLAB_TRIGGER_TOKEN} \
+    #     --form ref=${GITLAB_BRANCH} \
+    #     --form "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
+    #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline"
 
 fi
 
