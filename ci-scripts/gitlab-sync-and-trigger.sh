@@ -25,7 +25,7 @@ if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
     #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
 
     # https://docs.gitlab.com/ci/triggers/ 
-    curl -v --request POST \
+    curl  --request POST \
         --form token=${GITLAB_TRIGGER_TOKEN} \
         --form ref=$LATEST_TAG \
         --form "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
@@ -45,7 +45,7 @@ else
     #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
 
     # https://docs.gitlab.com/ci/triggers/ 
-    curl -v --request POST \
+    curl  --request POST \
         --form token=${GITLAB_TRIGGER_TOKEN} \
         --form ref=${GITLAB_BRANCH} \
         --form "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
