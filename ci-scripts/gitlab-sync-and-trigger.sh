@@ -3,12 +3,12 @@ set -e
 
 
 echo "Adding Gitlab remote"
-echo "$GITHUB_REF_TYPE  is github_ref_type and $GITHUB_REF  is github_Ref and ${GITHUB_REF#refs/tags/}"
+# echo "$GITHUB_REF_TYPE  is github_ref_type and $GITHUB_REF  is github_Ref and ${GITHUB_REF#refs/tags/}"
 # https://docs.gitlab.com/topics/git/troubleshooting_git/#error-on-git-fetch-http-basic-access-denied
 git remote add gitlab "https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
 # https://docs.gitlab.com/ci/variables/predefined_variables/?utm_source=chatgpt.com#ci_commit_before_sha will be always all zero for manually triggered pipeline ie through trigger or api request thats why send commit before sha as variable in api to use git diff in check-for relevant changes job
 PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
-echo "COMMIT_BEFORE_SHA: $PREVIOUS_COMMIT"
+# echo "COMMIT_BEFORE_SHA: $PREVIOUS_COMMIT"
 
 
 if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then

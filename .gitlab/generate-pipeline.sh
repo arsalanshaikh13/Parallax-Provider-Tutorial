@@ -11,7 +11,7 @@ set +e # gitlabci exits immediately by default due set -e so reverse the exit co
 # fi
 # check for file with specific extensions have changed or not
 CHANGED=$(git diff --pretty="" --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" 2>&1  | grep -E '\.js$|\.json$|\.yml$|\.lock$|\.sh$|\..*rc$' )
-echo "used git diff with variable using from api commit before sha -> $CI_COMMIT_BEFORE_SHA and current commit $CI_COMMIT_SHA"
+# echo "used git diff with variable using from api commit before sha -> $CI_COMMIT_BEFORE_SHA and current commit $CI_COMMIT_SHA"
 
 echo "output of diff: $CHANGED "
 if [ -z "$CHANGED" ]; then
