@@ -14,14 +14,14 @@ jobs:
 
     steps:
       - name: Checkout Github repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # clone full history, avoids shallow push rejection
+          fetch-depth: 50 # clone full history, avoids shallow push rejection
 
       - name: Push to Gitlab and Trigger GitLab Pipeline
         run: bash ./ci-scripts/gitlab-sync-and-trigger.sh
         env:
-          GITLAB_PUSH_TOKEN: ${{ secrets.GITLAB_PUSH_TOKEN }}
+          GITLAB_PUSH_TOKEN: ${{ secrets.GITLAB_PUSH_TOKEN }} # gitlab personal access token with write and read repository scope
           GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}
           GITLAB_BRANCH: ${{ secrets.GITLAB_BRANCH }}
-          GITLAB_PAT: ${{ secrets.GITLAB_PAT}}
+          GITLAB_PAT: ${{ secrets.GITLAB_PAT}} # gitlab project access token with owner and api scope
