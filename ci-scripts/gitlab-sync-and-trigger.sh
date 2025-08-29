@@ -35,10 +35,10 @@ else
     #     -H "Content-Type: application/json" \
     #     -d "{\"ref\":\"${GITLAB_BRANCH}\", \"variables\":[{\"key\":\"CI_COMMIT_BEFORE_SHA\", \"value\":\"COMMIT_BEFORE_SHA_HERE\"}]}" \
     #     "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/pipeline"
-    curl -X POST \
-        -F token=${GITLAB_TRIGGER_TOKEN} \
-        -F ref=${GITLAB_BRANCH} \
-        -F "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
+    curl --request POST \
+        --form token=${GITLAB_TRIGGER_TOKEN} \
+        --form ref=${GITLAB_BRANCH} \
+        --form "variables[CI_COMMIT_BEFORE_SHA]=${PREVIOUS_COMMIT}" \
         "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline"
 
 fi
