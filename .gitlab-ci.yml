@@ -14,7 +14,6 @@ workflow:
         - '**.js'
         - '**.json'
         - '**.*rc'
-        - '**.yml'
 
     - when: never # do not run pipeline on any other condition
 
