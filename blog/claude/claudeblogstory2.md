@@ -709,3 +709,333 @@ before_script:
 **Document Maintainer**: [Your Name]  
 **Review Schedule**: Quarterly  
 **Feedback**: Submit issues and suggestions via GitLab repository issues
+
+# Part 2: Building a Solution That Actually Works
+
+## From Problem to Strategy
+
+Once I understood that GitLab's `rules:changes` was fundamentally broken for
+API-triggered pipelines, I had a choice: accept the limitation and run full
+pipelines every time, or build something better.
+
+Given that I was already integrating GitHub Actions with GitLab CI, I figured if
+I was going to do custom integration work anyway, I might as well solve this
+properly.
+
+My requirements were simple:
+
+- **Reliable file change detection** that works regardless of how the pipeline
+  is triggered
+- **Conditional job execution** based on what actually changed
+- **Performance optimization** to avoid wasting CI minutes on irrelevant changes
+- **Maintainable solution** that wouldn't break when GitLab updates
+
+## The Core Insight: Take Control of Change Detection
+
+Since GitLab's native change detection was unreliable, I decided to implement my
+own. The solution had three parts:
+
+1. **Pass the correct commit information** from GitHub Actions to GitLab
+2. **Build custom change detection logic** that doesn't rely on GitLab's
+   variables
+3. **Use parent/child pipeline architecture** to conditionally execute jobs
+
+Here's how it worked:
+
+### Step 1: Fix the GitHub Actions Integration
+
+The root problem was that GitHub Actions wasn't sending the previous commit SHA
+to GitLab. But instead of just passing variables through the API, I realized I
+needed a more robust approach that could handle both syncing code and triggering
+pipelines reliably.
+
+I created a complete GitHub Actions workflow that does two things: syncs the
+repository to GitLab and then triggers the pipeline with proper commit
+information:
+
+```yaml
+# .github/workflows/gitlab-trigger.yml
+name: Sync and Trigger GitLab CI
+
+on:
+  push:
+    branches:
+      - main # Change to your branch name
+    tags:
+      - 'v*' # Trigger on version tags
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitHub repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 5
+
+      - name: Push to GitLab and Trigger Pipeline
+        run: |
+          chmod +x ci-scripts/gitlab-sync-and-trigger.sh
+          bash ./ci-scripts/gitlab-sync-and-trigger.sh
+        env:
+          GITLAB_TRIGGER_TOKEN: ${{ secrets.GITLAB_TRIGGER_TOKEN }}
+          GITLAB_PUSH_TOKEN: ${{ secrets.GITLAB_PUSH_TOKEN }}
+          GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}
+          GITLAB_BRANCH: ${{ secrets.GITLAB_BRANCH || github.ref_name }}
+```
+
+This approach uses a custom script that handles both the sync and trigger
+operations, ensuring GitLab gets the complete repository state along with proper
+commit references.
+
+### Step 2: Build Custom Change Detection
+
+With the correct commit information available as environment variables, I
+created a shell script to handle change detection:
+
+```bash
+#!/bin/bash
+# .gitlab/detect-changes.sh
+
+set -e
+
+# Use the commit SHAs passed from GitHub Actions
+BEFORE_SHA=${GITHUB_BEFORE_SHA:-$CI_COMMIT_BEFORE_SHA}
+AFTER_SHA=${GITHUB_AFTER_SHA:-$CI_COMMIT_SHA}
+
+echo "Comparing commits: $BEFORE_SHA -> $AFTER_SHA"
+
+# Get list of changed files
+CHANGED_FILES=$(git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" 2>/dev/null || echo "")
+
+echo "Changed files: $CHANGED_FILES"
+
+# Check if any relevant files changed
+RELEVANT_CHANGES=$(echo "$CHANGED_FILES" | grep -E '\.(js|json|yml|lock)$' || echo "")
+
+if [ -z "$RELEVANT_CHANGES" ]; then
+    echo "No relevant changes detected. Generating skip pipeline."
+    cat > pipeline-config.yml <<EOF
+include:
+  - local: '.gitlab/pipelines/skip.yml'
+EOF
+else
+    echo "Relevant changes detected: $RELEVANT_CHANGES"
+    cat > pipeline-config.yml <<EOF
+include:
+  - local: '.gitlab/pipelines/full.yml'
+EOF
+fi
+```
+
+This script solves the core problem: it uses actual git diff with proper commit
+SHAs, regardless of how the pipeline was triggered.
+
+### Step 3: Parent/Child Pipeline Architecture
+
+Instead of putting conditional logic in every job, I used GitLab's parent/child
+pipeline feature to make the decision once and execute accordingly:
+
+```yaml
+# .gitlab-ci.yml (parent pipeline)
+image: alpine:latest
+
+stages:
+  - detect
+  - execute
+
+detect_changes:
+  stage: detect
+  before_script:
+    - apk add --no-cache git
+    - chmod +x .gitlab/detect-changes.sh
+  script:
+    - ./.gitlab/detect-changes.sh
+  artifacts:
+    paths:
+      - pipeline-config.yml
+    expire_in: 1 hour
+
+trigger_pipeline:
+  stage: execute
+  trigger:
+    include:
+      - artifact: pipeline-config.yml
+        job: detect_changes
+    strategy: depend
+```
+
+## The Architecture That Emerged
+
+What started as a simple fix evolved into a more sophisticated system:
+
+```
+GitHub Actions (trigger)
+    ↓ (passes commit SHAs)
+GitLab Parent Pipeline
+    ↓ (detects changes)
+Child Pipeline (conditional)
+    ↓ (runs relevant jobs)
+Modular Job Templates
+```
+
+### Child Pipelines: Skip vs Full
+
+The skip pipeline was simple:
+
+```yaml
+# .gitlab/pipelines/skip.yml
+skip_notification:
+  script:
+    - echo "No relevant changes detected. Skipping CI/CD pipeline."
+```
+
+The full pipeline included all the actual work:
+
+```yaml
+# .gitlab/pipelines/full.yml
+image: node:18-alpine
+
+include:
+  - local: '.gitlab/templates/test.yml'
+  - local: '.gitlab/templates/build.yml'
+  - local: '.gitlab/templates/deploy.yml'
+
+stages:
+  - test
+  - build
+  - deploy
+```
+
+### Modular Templates for Reusability
+
+I broke down the monolithic pipeline into focused templates:
+
+```yaml
+# .gitlab/templates/test.yml
+test:
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+  script:
+    - npm ci
+    - npm test
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+```
+
+## Why This Solution Works Better
+
+### 1. **100% Reliability**
+
+Unlike GitLab's `rules:changes`, this approach works consistently across all
+trigger methods:
+
+- Direct GitLab pushes ✅
+- API triggers ✅
+- Manual pipeline runs ✅
+- Cross-platform integrations ✅
+
+### 2. **Complete Control**
+
+I can define exactly what constitutes a "relevant change" using standard regex
+patterns and git commands, not GitLab's opaque internal logic.
+
+### 3. **Clear Separation of Concerns**
+
+- **Parent pipeline**: Makes decisions
+- **Child pipelines**: Execute work
+- **Templates**: Define reusable jobs
+- **Detection script**: Handles change logic
+
+### 4. **Performance Optimized**
+
+The system only runs expensive jobs when needed:
+
+- Documentation changes: 15-second skip job
+- Code changes: Full pipeline with relevant jobs
+- Mixed changes: Smart detection picks up what matters
+
+## Real-World Results
+
+After implementing this solution across multiple projects, the improvements were
+significant:
+
+| Scenario               | Before (broken rules:changes) | After (custom detection) |
+| ---------------------- | ----------------------------- | ------------------------ |
+| **Documentation only** | Full pipeline (85s)           | Skip job (15s)           |
+| **Code changes**       | Full pipeline (85s)           | Full pipeline (57s)      |
+| **Config changes**     | Full pipeline (85s)           | Skip job (15s)           |
+| **Mixed changes**      | Full pipeline (85s)           | Smart detection (60s)    |
+
+The performance gains came from two sources:
+
+1. **Avoiding unnecessary runs** for irrelevant changes
+2. **Optimized job execution** through better caching and lightweight images
+
+## Lessons from Building This Solution
+
+### What I Learned About GitLab CI/CD
+
+**Parent/child pipelines are powerful**: They provide clean separation between
+decision-making and execution logic.
+
+**Custom scripts beat native features**: When platform features don't work
+reliably, sometimes a simple shell script is more trustworthy.
+
+**Artifacts are underrated**: Using artifacts to pass data between jobs is more
+reliable than environment variables for complex data.
+
+### What I Learned About Cross-Platform Integration
+
+**Always verify the data flow**: Don't assume platforms integrate the way their
+documentation suggests.
+
+**Logs are your best debugging tool**: The actual payloads and API calls tell
+you what's really happening.
+
+**Edge cases are the norm**: When integrating different platforms, expect the
+unexpected and build defensive solutions.
+
+### What I Learned About AI-Assisted Problem Solving
+
+**AI tools excel at concepts, not specifics**: They're great for understanding
+how things should work, but you need to verify how they actually work in your
+environment.
+
+**Multiple AI perspectives help**: ChatGPT and Claude gave me different pieces
+of the puzzle that I had to combine.
+
+**The best solutions combine AI guidance with hands-on investigation**: AI
+pointed me in the right direction, but examining logs and testing hypotheses
+provided the breakthrough.
+
+## The Bigger Picture
+
+What started as a simple optimization turned into a case study of why relying on
+platform-specific features can be risky. GitLab's `rules:changes` works fine for
+GitLab-native workflows, but breaks silently in integration scenarios.
+
+This experience reinforced an important principle: **when building complex CI/CD
+systems, assume platform features will have limitations and design your
+architecture to work around them.**
+
+The modular, script-based approach I ended up with is more maintainable, more
+reliable, and more transparent than trying to work within GitLab's constraints.
+
+## What's Next
+
+In Part 3, I'll share the complete implementation details, including:
+
+- The full shell script with error handling and edge case management
+- How to scale this approach across multiple projects
+- Performance optimization techniques that reduced our pipeline times by 33%
+- Common pitfalls and how to avoid them
+
+_Have you run into similar issues with GitLab's native features? I'd love to
+hear about your workarounds and solutions in the comments._

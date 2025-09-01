@@ -11,7 +11,7 @@
    - [Runtime detection for relevant files that works across all GitLab trigger scenarios](#runtime-detection-for-relevant-files-that-works-across-all-gitlab-trigger-scenarios)
    - [Performance optimization through lightweight images, Artifacts management and smart caching](#performance-optimization-through-lightweight-images-artifacts-management-and-smart-caching)
 5. [Performance Optimization Results](#performance-optimization-results)
-6. [Critical Insights](#critical-insights)
+6. [Critical Technical Insights](#critical-technical-insights)
 7. [Best Practices and Recommendations](#best-practices-and-recommendations)
 8. [Key Lessons Learned](#key-lessons-learned)
 9. [Conclusion: Why This Implementation Matters](#conclusion-why-this-implementation-matters)
@@ -503,15 +503,15 @@ and deciding between a **empty skip** or a **full** pipeline.
 - **Custom filtering**: Precise control using grep and regex pattern over which
   files trigger
 
-**Benefit**: 100% Reliable detection of relevant changed files vs 0% reliability
-in detecting relevant changed files
+**Benefit**: 100% Reliable detection of relevant changed files with custom
+script vs 0% reliability using native `rules:changes`
 
 ### Performance optimization through lightweight images, Artifacts management and smart caching
 
 #### Lightweight node-alpine images vs Full-featured ubuntu base Images
 
 **Problem**: Default base ubuntu images taking 20s to just load the images
-**Cause**: base ubuntu images are 800mb in size because having high amount of
+**Cause**: Base ubuntu images are 800mb in size because having high amount of
 tools built in
 
 **Solution**: Most of the base ubuntu images features were not required by my
@@ -577,7 +577,7 @@ operations
 | **Pipeline time (test, build, release)** | Full pipeline (115s ) | Full pipeline (86s )   | -25% time   |
 | **Non relevant file Changes**            | Full pipeline (85s )  | Skip job (24s)         | -72% time   |
 
-## Critical Insights
+## Critical Technical Insights
 
 - **Modular Pipeline Design** gitlab provides very simple mechanism to
   modularize the pipeline files into different templates and call them in one

@@ -163,7 +163,7 @@ jobs:
           GITLAB_BRANCH: ${{ secrets.GITLAB_BRANCH || github.ref_name }}
 ```
 
-**Why set `fetch-depth`**
+**Why set `fetch-depth`?**
 
 Set `fetch-depth: 5` to include previous commits for proper syncing with GitLab.
 This is important because:
@@ -340,11 +340,6 @@ rules:
   - if: $CI_PIPELINE_SOURCE == "trigger"'
 ```
 
-_in this blog i have assumed people have familiarity with github yml syntax and
-gitlab yml syntax if you dont have familiarity with gitlab's yml syntax I will
-cover in future blog to create a more comprehensive guide to define
-jobs/workflows for gitlab ci/cd_
-
 ## Conclusion
 
 With this setup, you now have:
@@ -360,12 +355,19 @@ powerful CI/CD features for free!
 _Happy coding! With this setup, you get the best of both worlds: GitHub's
 excellent collaboration features and GitLab's powerful CI/CD capabilities._
 
-citations
-[YouTube guide for mirroring](https://www.youtube.com/watch?v=E4Y6A1HplWc)
-[Gitlab docs for api trigger](https://docs.gitlab.com/ci/triggers/)
+In the next blog i will discuss the implementation guide of how to modularize
+gitlab ci/cd pipeline and run parent / child pipeline which runs only specific
+changed files
 
-- _“I leveraged ChatGPT as a research assistant to quickly explore different
-  solution paths, debug issues, and generate boilerplate code. Every
-  AI-generated suggestion was tested, adapted, and validated manually.”_
-- _“Like pair programming with an AI — it accelerates discovery, but the
-  responsibility to reason, refine, and integrate rests with me.”_
+## Prerequisite Knowledge
+
+- Basic understanding of Github Actions and GitLab CI/CD concepts (stages, jobs,
+  artifacts)
+- Familiarity with YAML syntax and structure
+- Basic shell scripting knowledge
+- Git workflow understanding (commits, branches, diffs)
+
+## citations
+
+- [YouTube guide for mirroring](https://www.youtube.com/watch?v=E4Y6A1HplWc)
+- [Gitlab docs for api trigger](https://docs.gitlab.com/ci/triggers/)
