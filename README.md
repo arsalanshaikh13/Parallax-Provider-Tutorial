@@ -207,21 +207,6 @@ graph LR
 
 - **Impact:** Faster jobs, less network churn, cleaner pipeline.
 
-### 4) Conditional artifacts / “don’t trigger if no changes”
-
-- **Problem:** Trigger job still tried to run when there were no relevant
-  changes.
-- **Cause:** Artifacts are defined at job start; can’t put rules **inside**
-  `artifacts`.
-- **Solutions:**
-  - Always generate `.gitlab/pipeline-config.yml` artifact, but write it to
-    include **`child-empty.yml`** when no changes.
-  - (Alternative) Split into two parent jobs with different rules; each
-    generates a different artifact.
-
-- **Impact:** Parent always succeeds; downstream behavior is controlled by the
-  generated include.
-
 ## Root Cause Analysis of Key Issues
 
 1. **`git diff` Failures**:
@@ -466,8 +451,6 @@ chmod +x .gitlab/scripts/*.sh
 | “Unable to create pipeline: include must implement script/run/trigger”       | Wrote `include:` but didn’t trigger a child                | Use parent job with `trigger: include: artifact:`         |
 | Child “skip” job failed with `unknown failure` when using `when: on_failure` | Misapplied `when:` semantics in child                      | Remove `when: on_failure`; just print and exit 0          |
 | Unwanted artifact downloads                                                  | Implicit dependencies                                      | `needs: { artifacts: false }` or `dependencies: []`       |
-| Coverage report rejected                                                     | Clover not supported in `coverage_report`                  | Export Cobertura from Jest, or use `coverage:` regex      |
-| Cache upload slow for tiny files                                             | TLS/zip overhead dominates                                 | Avoid caching tiny/low-value artifacts; prefer Yarn cache |
 
 ---
 
