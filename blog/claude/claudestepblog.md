@@ -138,7 +138,7 @@ name: Sync and Trigger GitLab CI
 on:
   push:
     branches:
-      - main # Change to your branch name
+      - gitlabci # Change to your branch name
     tags:
       - 'v*' # Trigger on version tags
 
