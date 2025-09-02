@@ -23,16 +23,16 @@ jobs:
             TAG_NAME="${GITHUB_REF#refs/tags/}"
             echo "Triggering CircleCI on tag: $TAG_NAME"
             curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
-              --header "Circle-Token: $CIRCLECI_PROJECT_API_TOKEN" \
+              --header "Circle-Token: $CIRCLECI_TOKEN" \
               --header "Content-Type: application/json" \
               --data "{\"tag\": \"${TAG_NAME}\"}"
           else
             BRANCH_NAME="${GITHUB_REF#refs/heads/}"
             echo "Triggering CircleCI on branch: $BRANCH_NAME"
             curl -X POST https://circleci.com/api/v2/project/gh/arsalanshaikh13/Parallax-Provider-Tutorial/pipeline \
-              --header "Circle-Token: $CIRCLECI_PROJECT_API_TOKEN" \
+              --header "Circle-Token: $CIRCLECI_TOKEN" \
               --header "Content-Type: application/json" \
               --data "{\"branch\": \"${BRANCH_NAME}\"}"
           fi
         env:
-          CIRCLECI_PROJECT_API_TOKEN: ${{ secrets.CIRCLECI_PROJECT_API_TOKEN }}
+          CIRCLECI_TOKEN: ${{ secrets.CIRCLECI_TOKEN }}
