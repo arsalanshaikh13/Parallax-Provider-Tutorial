@@ -214,7 +214,7 @@ end
 
 ```
 
-> the full implementation of the output flow is shown under "3. change detection
+> the full implementation of the output flow is shown under "3. Change detection
 > in the files" below
 
 ### 3. Change Detection in the files
@@ -414,9 +414,7 @@ artifacts
     if-no-files-found: error
 ```
 
-> these are just the some important snippets from the code for full code review
-> visit the repo at:
-> https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
+> You can find the source code in the [reference repository](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows).
 
 **what is happening**
 
@@ -459,6 +457,7 @@ artifacts
       if: always() # show the error reporting as well
 
 ```
+> You can find the source code in the [reference repository](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows).
 
 **what is happening**: it takes the test coverage generated during test and
 organized and beautifies and transforms into usable markdown format to be shown
