@@ -116,7 +116,7 @@ You'll need two types of tokens from GitLab:
 
 Now let's securely store these tokens in GitHub:
 
-1. **Go to:** GitHub → Your Repo → Settings → Secrets and Variables → Actions
+1. **Go to:** GitHub → Your Repo → Settings → Secrets and Variables → Actions → new Repository Secrets 
 2. **Add these secrets:**
 
 | Secret Name            | Value                              | Description                                |
