@@ -11,10 +11,10 @@ integration tricky. But don't worry—we've got a clever workaround!
 
 - No need to manage commit history on GitLab—use it solely for CI/CD purposes.
 - Maintain full control over when pipelines are triggered, rather than running
+  on every GitHub push.
 - Trigger pipelines on any specific branches or tags, not just the default
   branch.
-- Rollbacks, resets, and force pushes doesn't affect pipeline runs. on every
-  GitHub push.
+- Rollbacks, resets, and force pushes doesn't affect pipeline runs. 
 - Isolate pipeline execution to select branches, while other branches can
   continue using GitHub Actions or any alternative CI/CD tool to run pipelines.
 - Customize and extend with ease.
