@@ -680,9 +680,9 @@ operations
   request pipelines can all behave differently. Test them all.
 
 - **Observing job Logs is Essential:** When pipelines make dynamic decisions,
-  job logs provide feedback about the error that help to understand why actual
-  behavior is not matching expected behavior why decisions were made saves hours
-  of debugging time.
+  job logs provide feedback about the error that guide us to better understand
+  why actual behavior is not matching expected behavior and what decisions were
+  made. This saves hours of debugging time.
 
 ## Conclusion: Why This Implementation Matters
 
