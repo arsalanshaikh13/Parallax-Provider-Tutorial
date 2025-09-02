@@ -28,7 +28,7 @@ Here's what we'll accomplish:
 1. Import your GitHub repo into GitLab
 2. Set up secure tokens and secrets
 3. Create a GitHub Actions workflow that syncs code and triggers GitLab
-   pipelines
+   pipelines through API request
 4. Handle both branch pushes and tag releases
 
 Let's dive in!
