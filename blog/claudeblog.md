@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # 100+ steps doing everything
-      # No conditional execution
+      # Repetitive conditional execution
       # Poor caching strategy
       # No modular components
 ```
@@ -145,9 +145,7 @@ runs:
         github-token: ${{ inputs.secret_input_github_token }}
 ```
 
-> these are just the some important snippets from the code for full code review
-> visit the repo at:
-> https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
+> You can find the source code in the [reference repository](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows).
 
 ### 2. Output Flow: From Steps in reusable workflow to Conditional Execution of job in parent caller workflow
 
@@ -198,6 +196,7 @@ jobs:
     needs: filter-changes
     if: needs.filter-changes.outputs.has_relevant_changes == 'true'
 ```
+> You can find the source code in the [reference repository](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows).
 
 output flow chart:
 
@@ -306,9 +305,8 @@ jobs:
           fi
 ```
 
-> these are just the some important snippets from the code for full code review
-> visit the repo at:
-> https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows
+
+> You can find the source code in the [reference repository](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows).
 
 **what is happening**:
 
@@ -373,6 +371,7 @@ to:
   run: yarn install  --frozen-lockfile
   shell: bash
 ```
+> You can find the source code in the [reference repository](https://github.com/arsalanshaikh13/Parallax-Provider-Tutorial/tree/main/.github/workflows).
 
 **Why this Works:**
 
