@@ -190,7 +190,7 @@ This is important because:
 
 - Change `branches` to match your workflow
 - Adjust `tags` pattern for your release strategy
-- Use `workflow_dispatch` for manual testing
+
 
 ## Step 7: Create the Sync Script
 
