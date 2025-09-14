@@ -497,15 +497,15 @@ workflows). The script then stitches them together into a single
 
 #### Lightweight images vs Full-featured base Images
 
-**Problem**: Default `cimg/base:latest` images taking long time to just load the
-images
+- **Problem**: Default `cimg/base:latest` images taking long time to just load
+  the images
 
-**Cause**: Base images are bigger in size because having high amount of tools
-built in
+- **Cause**: Base images are bigger in size because having high amount of tools
+  built in
 
-**Solution**: Most of the base images features were not required by my projects
-so i used `node-18:Alpine` Linux for most jobs, `busybox:latest` images only
-when needed
+- **Solution**: Most of the base images features were not required by my
+  projects so i used `node-18:Alpine` Linux for most jobs, `busybox:latest`
+  images only when needed
 
 **Benefit** Huge size reduction significantly improved pipeline speed
 
