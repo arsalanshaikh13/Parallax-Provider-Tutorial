@@ -416,19 +416,5 @@ problem
 
 problem faced by deveopers my implementation solving those problems
 
-circle ci blog in 3hrs outline: pain > consequences > solution > benefit why do
-i want to finish the blog so that it is ready to be published test
-parallaxprovider setup from npm install
-
-getting back to docker 1 day , why docker is used in devops, mlops, aiops,
-llmops ; kubernetes, what are the important concepts to learn about docker and
-kubernetes, how to manage kubernetes on cloud service providers
-
-rotate slider > javascript > react class > react hooks web development
-html,css,scss, 3days with tailwind and bootstrap, bedimcode
-
-mern stack, react scrimba 1 day i want to learn full stack development for api
-design practice,python practice
-
-all important concepts of react, with code implementation how react concepts are
-applied in learning and developing llms
+what will happen if i worked on the blog? copy pasting stuff from the gpt so
+what is wrong with that?

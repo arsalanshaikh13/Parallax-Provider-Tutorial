@@ -30,3 +30,89 @@ how to proceed ahead with the blog? first create a blog about triggering circle
 ci pipeline from github actions using API request first generate personal access
 token from circle ci to use in curl request only generate circle ci pipeline
 when pushed from circleci branch or tag
+
+
+
+- problem:
+- pipeline ran on every file change ( not only on specific file change)
+- pipeline ran slowly (due to no caching, large base images)
+- pipeline didn't ran ( due to no artifact sharing between jobs)
+- monolithic file became to large to handle
+- repetitively writing same condition on different job
+- could not pass the parameters between jobs
+
+- cause:
+no 
+- impact of problem:
+- waste compute resources and ci/cd time and
+- slow development time  due to slow feedback on ci/cd 
+- painful debugging and maintenance of having to lookup large yml file for any part of code for monitoring and modifying
+- grouping together similar jobs
+
+- **Wasted Resources**: Studies show 60-80% of CI/CD runs execute unnecessary
+  jobs
+- **Developer Frustration**: 73% of developers report CI/CD bottlenecks impact
+  their productivity (2024 DevOps Survey)
+- **Financial Impact**: Companies with 10+ developers waste $2,000-$5,000
+  monthly on redundant pipeline executions
+- **Scaling Problems**: Monolithic pipelines become exponentially slower as
+  codebases grow
+
+- solution:
+- modular architecture
+- file change detection
+- dynamic pipeline generation (with grouped jobs)
+- conditional execution of jobs
+
+impact of solution:
+few wasted runs, pipeline running on relevant files being changed,
+better grouping of jobs, faster lookup of individual jobs, less repetition of condition, better maintenance of pipeline
+
+jobs are reusable within the same job(have to adjust preprocessor.sh (reusability of job is not possible with config pack without copy pasting the job in a new file) 
+
+- obstacle not letting pipeline run:
+- circleci config pack combines modular files in alphabetical order and not in the standard order (makes it difficult to understand and debug the generated fie) 
+
+- filter not present in dependency job despite dependency job is required in dependent job which has filter
+solution to obstacle:
+- custome preprocessor that combines modular files in standard order
+- added filter in each job mentioned in the workflow
+
+look for the problem and put them in problems bucket and look for consequences of the problem and put them in consequences and impact bucket
+feeling tired 
+
+while running CI/CD we usually face:
+- problem:
+- pipeline ran on every file change ( not only on specific file change)
+- pipeline ran slowly 
+- pipeline didn't ran 
+- monolithic file became to large to handle
+- repetitively writing same condition on different job
+
+solution
+pipeline ran faster
+pipeline ran on specific file changes
+pipeline ran
+pipeline became scalable, maintainable, readable
+
+
+i achieved this by implementing
+  - Modular template system for reusable CI/CD components
+  - Dynamic parent/child pipeline architecture for conditional execution
+  - Runtime detection for relevant files that works across all GitLab trigger
+    scenarios
+  - Performance optimization through lightweight images, Artifacts management
+    and smart caching
+
+lets look at the implementation how i achieved the outcome with implementation which will explain the problem -> root cause -> solution -> impact
+Overview
+problem - consequences - solution - benefit/impact
+solution
+modular architecture - layout - components explanation
+implementation deep dive 
+config pack different files
+
+root cause analysis/ insight into circleci behavior
+config pack in alphabetical order - so design preprocessor.sh
+filters has to be on dependency job when there is filter on dependent job
+best practices / recommendations

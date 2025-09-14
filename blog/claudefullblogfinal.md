@@ -426,40 +426,6 @@ save_cache/restore_cache, while sequential jobs require workspace persistence.
   reproducible builds
 - **Image optimization**: Choose lightweight but feature-complete base images
 
-## Troubleshooting Guide: Debug Commands and Validation
-
-### Configuration Validation
-
-```bash
-# Verify generated configuration content
-cat .circleci/config_continue.yml
-
-# Validate configuration syntax
-circleci config validate /tmp/generated-config.yml
-
-# Check workspace file availability
-ls -la .
-```
-
-### Pipeline Debugging
-
-```bash
-# Show environment variables
-printenv | sort
-
-# Examine changed files
-git -c core.quotepath=false diff --name-only "$(git merge-base origin/main $CIRCLE_SHA1)" "$CIRCLE_SHA1"
-
-# Verify branch commit relationships
-git branch --contains <commit-sha>
-```
-
-### External Integration Debugging
-
-- Check GitHub webhook delivery status for trigger verification
-- Verify CircleCI project settings for proper repository integration
-- Review context and environment variable configuration
-
 ## Conclusion: From Fragile to Reliable Dynamic Pipelines
 
 This implementation demonstrates that dynamic CircleCI configuration, while
