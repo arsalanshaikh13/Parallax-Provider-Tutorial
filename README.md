@@ -186,15 +186,14 @@ Note: if checktout and attach_workspace is used as a prestep will cause a double
 checkout in logs because some orb jobs internally checkout — harmless but
 expected.
 
-### 3) Use proper base images (no BusyBox)
+### 3) Use lightweight images
 
-- Replace `busybox:latest` with one of:
-  - `cimg/base:stable` (recommended)
-  - `alpine:latest` + `apk add --no-cache git openssh bash curl jq`
-  - Or your own custom image with tools preinstalled
+- Replace `cimg/base:stable` with one of:
+  - `busybox:latest` for parent pipeline as it has no complex code in it
+  - `node-18:alpine` for child pipeline to run node scripts`
 
-Why: Git, SSH, bash, and curl are required during generation and for
-path-filtering orb logic.
+Why: base images are bloated and takes high time to load, lightweight images
+load faster
 
 ### 4) Avoid silent skipping by controlling `requires` & filters
 

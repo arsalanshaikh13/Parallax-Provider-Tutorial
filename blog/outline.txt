@@ -1,3 +1,5 @@
+grep -E '^#{1,6}\s+.+' blog/claudefullblogfinal.md >> blog/outline.txt
+
 outline1 claudefullblogfinal.md
 
 # Building Production-Ready Dynamic CircleCI Pipelines: Real Problems and Engineering Solutions
@@ -73,7 +75,7 @@ outline 2 clauderoughblog.md
 # Clear any existing output
 # Base configuration (version, parameters, executors)
 # Jobs section
-# Workflows section
+# Workflows section 
 ### Setup Configuration (`config.yml`)
 ### Caching Strategy Implementation
 # In dependency job
@@ -256,3 +258,30 @@ outline 5 savecostsblog.md
 ### Why This Matters for Hiring Managers
 ### What's Next
 ## Call-to-Action
+
+outline 6 blogfinal.md
+
+# Building Dynamic CircleCI Pipelines: An Implementation Guide
+### Intro: The Common Problems
+### Why This Matters
+### My Implementation Approach
+### What You’ll Learn in This Deep Dive
+## Implementation Details
+### 1. Modular Architecture
+#### Component Responsibilities
+#### Design Decision: Monolithic vs Modular CI/CD Workflows
+### 2. Dynamic Parent/Child Pipeline Architecture for Conditional Execution
+#### Here's How it works
+### 3. Script to concatenate modular files
+#### Here’s how it works step by step:
+#### Why It’s Useful
+### 4. Performance optimization through lightweight images and caching strategy
+#### Lightweight images vs Full-featured base Images
+#### Caching strategy
+## Edge Cases & Problem Resolution
+### Case 1: Workspace File Availability
+### Case 2: path-filtering/filter job is not executed
+### Case 3: Silent Tag Filtering Failures
+## Deep Root-Cause Analysis (Key Points)
+## Best Practices & Recommendations
+## Conclusion
