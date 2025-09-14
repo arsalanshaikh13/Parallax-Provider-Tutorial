@@ -11,4 +11,3 @@ ci_build.yml
 .gitlab-ci.yml
 out*.txt
 curl.sh
-blog

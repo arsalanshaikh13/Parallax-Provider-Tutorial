@@ -102,7 +102,8 @@ fixed it, and why those fixes matter.
 - The implemented changes result in a highly flexible, performant, and secure
   CI/CD pipeline.
 - Build times are significantly reduced due to effective caching and dependency
-  management. The modular configuration is easy to maintain and scale.
+  management.
+- The modular configuration is easy to maintain and scale.
 - By controlling pipeline execution, we avoid unnecessary builds, saving credits
   and providing a clear, auditable workflow.
 - **Net effect:** fewer wasted runs, clearer modular structure, and reliable tag

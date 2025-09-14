@@ -1,0 +1,32 @@
+- Overview
+- Prerequisite Knowledge
+- The Problem: When GitLab CI/CD Features Break Down
+- Solution Implementation Deep Dive
+  - Modular template system for reusable CI/CD components
+  - Dynamic parent/child pipeline architecture for conditional execution
+  - Runtime detection for relevant files that works across all GitLab trigger
+    scenarios
+  - Performance optimization through lightweight images, Artifacts management
+    and smart caching
+- Performance Optimization Results
+- Critical Technical Insights
+- Best Practices and Recommendations
+- Key Lessons Learned
+- Conclusion: Why This Implementation Matters
+
+- Overview
+- Goals
+- What I implemented
+- Impact of the fixes
+- Problems encountered (summary)
+- Deep root-cause analysis
+- Fixes (what I changed, why)
+- Example config snippets
+- Debug checklist / commands
+- Best practices & recommendations
+- Result of the fixes
+
+how to proceed ahead with the blog? first create a blog about triggering circle
+ci pipeline from github actions using API request first generate personal access
+token from circle ci to use in curl request only generate circle ci pipeline
+when pushed from circleci branch or tag
