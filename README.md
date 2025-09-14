@@ -131,26 +131,37 @@ fixed it, and why those fixes matter.
 
 ---
 
-## Deep root-cause analysis (key points)
+## Deep Root-Cause Analysis (Key Points)
 
-- **Workspace & ordering:** all the separate workflow run on separate containers
-  files can only be transferred through workspaces, If the generated
-  continuation file is not persisted and attached before the `path-filtering`
-  job runs, the orb cannot find it. You must `persist_to_workspace` in the
-  generator job and `attach_workspace` in the consumer job (or run the generator
-  as a pre-step).
-- **Checkout vs attach_workspace:** `checkout` must run before
-  `attach_workspace` in jobs that expect a Git repo + attached workspace
-  (otherwise Git complains or double-checkout occurs). Some orb jobs implicitly
-  run a checkout; ordering in `pre-steps` matters.
-- **filters interaction:** filters are evaluated during compile time and not on
-  run time. If `generate-config` doesn't has filters as its dependent job (e.g.,
-  missing tag filter), any job that `requires` it will also be excluded if that
-  job has tag filters. That causes silent skipping on tags. Either ensure
-  `generate-config` has on tags filter,
-- **Order**: CircleCI config pack logic is not aware of your semantic order it
-  packs in alphabetical order as per files order; you must explicitly control
-  concatenation order.
+- **Workspace & Ordering**
+  - Each workflow job runs in its own isolated container.
+  - Files must be explicitly shared via **workspaces**.
+  - If the generated continuation config (`config_continued.yml`) is not
+    **persisted in the generator job** and **attached in the consumer job**, the
+    `path-filtering` orb cannot find it.
+  - Fix → Always `persist_to_workspace` in the generator and `attach_workspace`
+    in the next job (or run the generator as a pre-step).
+
+- **Checkout vs Attach Workspace**
+  - `checkout` must come **before** `attach_workspace` in jobs that need both
+    repo code + workspace.
+  - Otherwise, Git throws errors (`directory not empty`) or double-checkouts
+    occur.
+  - Note: Some orb jobs automatically run `checkout`, so ordering in `pre-steps`
+    is critical.
+
+- **Filters Evaluation**
+  - Filters (branch, tags) are resolved at **compile-time**, not at runtime.
+  - If the `generate-config` job does not include the same tag filters as its
+    dependent jobs, those dependent jobs are silently excluded on tag runs.
+  - Fix → Ensure `generate-config` has **matching filters** for branches/tags as
+    its dependent path-filtering/filter job.
+
+- **File Concatenation Order**
+  - CircleCI’s config pack logic doesn’t infer **semantic ordering**.
+  - By default, it merges files in alphabetical order.
+  - Fix → Explicitly control file concatenation order (e.g., via the
+    preprocessor script).
 
 ---
 
