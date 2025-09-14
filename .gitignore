@@ -11,4 +11,4 @@ ci_build.yml
 .gitlab-ci.yml
 outp*.txt
 curl.sh
-.circleci/config_c*.yml
+.circleci/config_continue.yml
