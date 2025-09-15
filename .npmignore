@@ -11,3 +11,4 @@ project/
 .ci_build.yml
 .github
 node_modules
+.circleci/
