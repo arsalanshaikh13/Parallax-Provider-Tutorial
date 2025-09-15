@@ -347,6 +347,7 @@ workflows:
      `config_continued.yml`.
    - That file represents the **child pipeline** (the real pipeline to run).
    - Then, it shares the file via **workspace** so the next job can access it.
+   - the preprocessor.sh script is discussed in detail in the next section
 
 5. **Setup Workflow**
    - Runs two jobs:
@@ -414,6 +415,7 @@ want more flexibility.
 ```sh
 # .circleci/preprocessor.sh
 # you can customise the preprocessor script to suit your file naming convention
+# this preprocessor script is used in the parent pipeline
 
 #!/bin/bash
 set -e
