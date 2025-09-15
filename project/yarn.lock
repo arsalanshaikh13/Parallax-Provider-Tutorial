@@ -1431,9 +1431,9 @@ parallaxturtlelib@^1.0.1-gitlabci.12:
   integrity sha512-+CAWTHGm7K/w9NFR67JfsTadUQBoYZJnt12yD+OP6aH1eUtDbt+rX8Jq5ARh3hpvco/sZdavyEGx52mLV4100w==
 
 parallaxturtlelibcircle@^1.0.1-circleci.10:
-  version "1.0.1-circleci.11"
-  resolved "https://registry.npmjs.org/parallaxturtlelibcircle/-/parallaxturtlelibcircle-1.0.1-circleci.11.tgz"
-  integrity sha512-7nLVUvnotFYa9R+PRayE1CHRe3qHgTdkMjPEA6vVEEqxMWTCDr/mNZ9aTcQS5AYvXAVoiwsSP801BJFZmCuDeg==
+  version "1.0.1-circleci.13"
+  resolved "https://registry.npmjs.org/parallaxturtlelibcircle/-/parallaxturtlelibcircle-1.0.1-circleci.13.tgz"
+  integrity sha512-Q9OHOjAM5yduUzCRcv3drxCwYHp1Z4UtMS0bdayBL2iyuy2fh7FBo79ZYwQQIxs8AjV35yTgkoQI2rQVqhNsgQ==
 
 parseurl@~1.3.2, parseurl@~1.3.3:
   version "1.3.3"
