@@ -11,9 +11,9 @@
   },
   "author": "",
   "dependencies": {
-    "parallax-provider-tutorial-library": "^1.0.12",
-    "parallaxturtlelib": "^1.0.1-gitlabci.12",
-    "parallaxturtlelibcircle": "^1.0.1-circleci.10"
+    "parallax-provider-tutorial-library": "^1.0.14",
+    "parallaxturtlelib": "^1.0.1-gitlabci.16",
+    "parallaxturtlelibcircle": "^1.0.1-circleci.13"
   },
   "devDependencies": {
     "webpack": "^5.100.2",
