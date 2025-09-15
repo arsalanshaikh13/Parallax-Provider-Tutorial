@@ -12,3 +12,4 @@ project/
 .github
 node_modules
 .circleci/
+blog/
