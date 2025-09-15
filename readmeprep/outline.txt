@@ -108,3 +108,17 @@ outline 4 read1.md
 ## Major impact (why this matters)
 ## Repro & support notes
 ## Closing / Next steps
+
+
+
+what to do next?
+convert rotate slider into javascript and react class and hooks based website and typescript based website
+ testing parallax library
+ learning docker, kubernetes
+
+ what is confusing should i learn frontend development + full stack development in  a 
+ should i start learning web development for a week or should i start learning about ml/dl from today by starting the subscription today
+
+ ml/dl software
+ ai infrastructure computing related studies
+ low level language like c, slurm, cloud, linux
