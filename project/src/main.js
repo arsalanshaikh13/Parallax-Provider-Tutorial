@@ -2,9 +2,9 @@
 // import ParallaxProvider from "../parallaxturtle/dist/parallax-provider.es.js";
 // import ParallaxProvider from '../../src';
 // downloaded the npm library which i published and using that library here from node_modules
-// import ParallaxProvider from 'parallax-provider-tutorial-library';
+import ParallaxProvider from 'parallax-provider-tutorial-library';
 // import ParallaxProvider from 'parallaxturtlelib';
-import ParallaxProvider from 'parallaxturtlelibcircle';
+// import ParallaxProvider from 'parallaxturtlelibcircle';
 console.log(ParallaxProvider);
 // https://hungryturtlecode.com/projects/parallax-rewrite/  - using the library
 const fg = document.querySelector('.foreground');
