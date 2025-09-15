@@ -14,4 +14,4 @@ project/
 node_modules
 blog/
 readmeprep/
-**.md
+**/*.md
