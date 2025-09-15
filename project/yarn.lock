@@ -1425,12 +1425,12 @@ parallax-provider-tutorial-library@^1.0.12:
   resolved "https://registry.npmjs.org/parallax-provider-tutorial-library/-/parallax-provider-tutorial-library-1.0.14.tgz"
   integrity sha512-gRhNUiKPA/PFg2PApGr+GzPLRtN4IvR3H1qrwQhQNjeZ+e+fG0KdvTL14FQSbAhGsuys1vavn76t5P1o2ihrGw==
 
-parallaxturtlelib@^1.0.1-gitlabci.12:
-  version "1.0.1-gitlabci.14"
-  resolved "https://registry.npmjs.org/parallaxturtlelib/-/parallaxturtlelib-1.0.1-gitlabci.14.tgz"
-  integrity sha512-0n8vaCHkrElQNhD7CGLueP5PZXI7ZAgSk8XlFkTRNc5JuuHlHZF3TmnoxlugUG/gH8h7QATSHz58vDjSOBdBeQ==
+parallaxturtlelib@^1.0.1-gitlabci.16:
+  version "1.0.1-gitlabci.16"
+  resolved "https://registry.npmjs.org/parallaxturtlelib/-/parallaxturtlelib-1.0.1-gitlabci.16.tgz"
+  integrity sha512-71Gn9VPST/1d+qsBT9AnAAofd3T9jvD3oIfpSl0n6PX49hPoLzJUgNIbQ/BmJhE34V7onp14mbWgYn1J163uMw==
 
-parallaxturtlelibcircle@^1.0.1-circleci.10:
+parallaxturtlelibcircle@^1.0.1-circleci.13:
   version "1.0.1-circleci.13"
   resolved "https://registry.npmjs.org/parallaxturtlelibcircle/-/parallaxturtlelibcircle-1.0.1-circleci.13.tgz"
   integrity sha512-Q9OHOjAM5yduUzCRcv3drxCwYHp1Z4UtMS0bdayBL2iyuy2fh7FBo79ZYwQQIxs8AjV35yTgkoQI2rQVqhNsgQ==
