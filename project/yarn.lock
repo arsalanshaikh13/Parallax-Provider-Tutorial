@@ -1426,9 +1426,9 @@ parallax-provider-tutorial-library@^1.0.14:
   integrity sha512-gRhNUiKPA/PFg2PApGr+GzPLRtN4IvR3H1qrwQhQNjeZ+e+fG0KdvTL14FQSbAhGsuys1vavn76t5P1o2ihrGw==
 
 parallaxturtlelib@^1.0.1-gitlabci.14:
-  version "1.0.1-gitlabci.14"
-  resolved "https://registry.npmjs.org/parallaxturtlelib/-/parallaxturtlelib-1.0.1-gitlabci.14.tgz"
-  integrity sha512-0n8vaCHkrElQNhD7CGLueP5PZXI7ZAgSk8XlFkTRNc5JuuHlHZF3TmnoxlugUG/gH8h7QATSHz58vDjSOBdBeQ==
+  version "1.0.1-gitlabci.16"
+  resolved "https://registry.npmjs.org/parallaxturtlelib/-/parallaxturtlelib-1.0.1-gitlabci.16.tgz"
+  integrity sha512-71Gn9VPST/1d+qsBT9AnAAofd3T9jvD3oIfpSl0n6PX49hPoLzJUgNIbQ/BmJhE34V7onp14mbWgYn1J163uMw==
 
 parallaxturtlelibcircle@^1.0.1-circleci.13:
   version "1.0.1-circleci.13"
