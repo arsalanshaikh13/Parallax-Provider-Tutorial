@@ -43,14 +43,14 @@ export default class ParallaxProvider {
       const yoff = window.pageYOffset; //window.scrollY
       this.modules.forEach((module) => {
         const duration = module.duration;
-        console.log(
-          yoff,
-          module,
-          //duration,
-          // module._absMountPoint,
-          yoff - module._absMountPoint,
-          'offset ',
-        );
+        // console.log(
+        //   yoff,
+        //   module,
+        //   //duration,
+        //   // module._absMountPoint,
+        //   yoff - module._absMountPoint,
+        //   'offset ',
+        // );
         module.controller(yoff - module._absMountPoint, duration);
       });
     });

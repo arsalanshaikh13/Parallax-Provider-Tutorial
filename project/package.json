@@ -10,7 +10,11 @@
     "start": "webpack serve"
   },
   "author": "",
-  "dependencies": {},
+  "dependencies": {
+    "parallax-provider-tutorial-library": "^1.0.12",
+    "parallaxturtlelib": "^1.0.1-gitlabci.12",
+    "parallaxturtlelibcircle": "^1.0.1-circleci.10"
+  },
   "devDependencies": {
     "webpack": "^5.100.2",
     "webpack-cli": "^6.0.1",

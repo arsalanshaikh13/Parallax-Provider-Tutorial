@@ -9,3 +9,4 @@ Gemini-Husky, Eslint, Prettier Integration Guide.md
 .travis.yml
 ci_build.yml
 .gitlab-ci.yml
+curl.sh
