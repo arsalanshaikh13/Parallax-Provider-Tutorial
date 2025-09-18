@@ -13,10 +13,11 @@ RUN yarn install --frozen-lockfile
 # copy rest of the project
 COPY . .
 
-
+ENV PATH=/app/node_modules/.bin:${PATH}
 
 
 # create docker image with installed dependencies
 # push the image to container registry
 # pull the image in circleci
 # run yarn test and build
+# how to test my image

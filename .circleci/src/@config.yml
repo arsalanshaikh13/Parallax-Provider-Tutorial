@@ -11,7 +11,7 @@ executors:
   node_executor:
     docker:
       # pullin my image from dockerhub
-      - image: arsalanshaikh13/parallaxturtlelibcircle:v1
+      - image: arsalanshaikh13/parallaxturtlelibcircle:v2
     working_directory: ~/app
 
 anchors:
