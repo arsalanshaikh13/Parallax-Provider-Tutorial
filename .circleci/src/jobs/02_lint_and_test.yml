@@ -5,11 +5,8 @@ lint_and_test:
         pwd
         ls -lhra
         ls node_modules | grep eslint
-    - checkout
-    - run: |
-        pwd
-        ls -lhra
-        ls node_modules | grep eslint
-    - run: ls node_modules | grep eslint
+    # - checkout
+    # - attach_workspace:
+    #     at: ~/app
     - run: yarn lint
     - run: yarn test

@@ -1,11 +1,11 @@
 build:
   executor: node_executor
   steps:
-    - checkout
-    - attach_workspace:
-        at: ~/app
+    # - checkout
+    # - attach_workspace:
+    #     at: ~/app
     - run: yarn build
     - persist_to_workspace:
-        root: .
+        root: /app
         paths:
           - dist
