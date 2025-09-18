@@ -6,8 +6,6 @@ lint_and_test:
         ls -lhra
         ls node_modules | grep eslint
     - checkout
-    - attach_workspace:
-        at: ~/app
     - run: |
         pwd
         ls -lhra

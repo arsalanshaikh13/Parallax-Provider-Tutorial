@@ -12,7 +12,7 @@ executors:
     docker:
       # pullin my image from dockerhub
       - image: arsalanshaikh13/parallaxturtlelibcircle:v2
-    working_directory: ~/app
+    working_directory: /app
 
 anchors:
   tag_filter: &tag_filter
