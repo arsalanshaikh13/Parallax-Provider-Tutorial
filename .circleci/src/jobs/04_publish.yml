@@ -3,7 +3,7 @@ publish:
   steps:
     - checkout
     - attach_workspace:
-        at: .
+        at: ~/app
     - run:
         name: Authenticate with npm
         command: |
