@@ -19,4 +19,6 @@ anchors:
       only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
   branch_filter: &branch_filter
     branches:
-      only: circleci
+      only:
+        - circleci
+        - circleci-docker

@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - circleci
+      - circleci-docker
     tags:
       - 'v*-circleci.*'
 
