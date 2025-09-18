@@ -3,7 +3,7 @@ lint_and_test:
   steps:
     - checkout
     - attach_workspace:
-        at: /app
+        at: ~/app
     - run: pwd
     - run: ls node_modules | grep eslint
     - run: yarn lint
