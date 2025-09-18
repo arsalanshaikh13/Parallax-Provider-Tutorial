@@ -12,4 +12,7 @@ ci_build.yml
 outp*.txt
 curl.sh
 .circleci/config_continue.yml
+blog/
 dockerinit/
+readmeprep/
+project/

@@ -2,13 +2,13 @@ version: 2.1
 build_and_release:
   when: << pipeline.parameters.run-build-and-release >>
   jobs:
-    - install:
-        filters:
-          <<: *branch_filter
-          <<: *tag_filter
+    # - install:
+    #     filters:
+    #       <<: *branch_filter
+    #       <<: *tag_filter
     - lint_and_test:
-        requires:
-          - install
+        # requires:
+        #   - install
         filters:
           <<: *branch_filter
           <<: *tag_filter

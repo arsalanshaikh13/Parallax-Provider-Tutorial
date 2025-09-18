@@ -10,9 +10,8 @@ parameters:
 executors:
   node_executor:
     docker:
-      # - image: cimg/node:18.20
-      # updated: using the lightweight 'node:18-alpine' image for faster download in ci setup and faster pipelines
-      - image: node:18-alpine
+      # pullin my image from dockerhub
+      - image: arsalanshaikh13/parallaxturtlelibcircle:v1
 
 anchors:
   tag_filter: &tag_filter
