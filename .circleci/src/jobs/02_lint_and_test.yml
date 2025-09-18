@@ -4,7 +4,10 @@ lint_and_test:
     - checkout
     - attach_workspace:
         at: ~/app
-    - run: pwd
+    - run: |
+        pwd
+        ls -lhra
+        ls node_modules | grep eslint
     - run: ls node_modules | grep eslint
     - run: yarn lint
     - run: yarn test
