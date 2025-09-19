@@ -10,6 +10,8 @@ docker_project:
           cd Parallax-Provider-Tutorial
           git sparse-checkout set --no-cone "project/*"
           git checkout HEAD
+          git sparse-checkout list
+          ls -lra
     - setup_remote_docker: # gives you a remote Docker engine
         docker_layer_caching: true
     - run:
