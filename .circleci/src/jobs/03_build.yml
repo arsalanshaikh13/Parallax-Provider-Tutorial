@@ -6,6 +6,6 @@ build:
         at: .
     - run: yarn build
     - persist_to_workspace:
-        root: /app
+        root: .
         paths:
           - dist
