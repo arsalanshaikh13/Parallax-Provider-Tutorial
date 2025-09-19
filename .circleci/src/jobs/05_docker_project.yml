@@ -17,6 +17,7 @@ docker_project:
     - run:
         name: Build Image and Push to DockerHub
         command: |
+          ls -lra
           cd project
           docker build -t arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1} .
           echo $DOCKERHUB_PAT | docker login -u $DOCKERHUB_USERNAME --password-stdin
