@@ -1,16 +1,14 @@
 docker_project:
-  executor:
-    docker:
-      - image: docker:20.10-git
+  docker:
+    - image: docker:20.10-git
 
   steps:
-    - checkout
-    - attach_workspace:
-        at: .
     - run:
         name: git sparse-checkout clone
         command: |
-          git remote add origin "https://oauth2:${CIRCLECI_PULL_TOKEN}@github.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
+          git clone --no-checkout --sparse --depth=1 "https://${GITHUB_USERNAME}:${GITHUB_PULL_TOKEN}@github.com/${GITHUB_USERNAME}/Parallax-Provider-Tutorial.git"
+          git sparse-checkout set --no-cone "project/*"
+          git checkout HEAD
     - setup_remote_docker: # gives you a remote Docker engine
         docker_layer_caching: true
     - run:
@@ -20,3 +18,14 @@ docker_project:
           docker build -t arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1} .
           echo $DOCKERHUB_PAT | docker login -u $DOCKERHUB_USERNAME --password-stdin
           docker push arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1}
+
+
+project
+  src
+    main.css
+    main.js
+  index.html
+  package-lock.json
+  package.json
+  webpack.config.js
+  yarn.lock
