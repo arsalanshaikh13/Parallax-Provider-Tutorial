@@ -1,12 +1,8 @@
 lint_and_test:
   executor: node_executor
   steps:
-    - run: |
-        pwd
-        ls -lhra
-        ls node_modules | grep eslint
-    # - checkout
-    # - attach_workspace:
-    #     at: ~/app
+    - checkout
+    - attach_workspace:
+        at: .
     - run: yarn lint
     - run: yarn test

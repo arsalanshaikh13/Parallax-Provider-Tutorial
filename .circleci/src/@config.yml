@@ -11,13 +11,14 @@ executors:
   node_executor:
     docker:
       # pullin my image from dockerhub
-      - image: arsalanshaikh13/parallaxturtlelibcircle:v2
-    working_directory: /app
+      # - image: arsalanshaikh13/parallaxturtlelibcircle:v2
+      # working_directory: /app
+      - image: node:18-alpine
 
 anchors:
   tag_filter: &tag_filter
     tags:
-      only: /^v\d+\.\d+\.\d+-circleci\.\d+$/ # Updated regex to match the corrected tag format
+      only: /^v\d+\.\d+\.\d+-circleci-docker\.\d+$/ # Updated regex to match the corrected tag format
   branch_filter: &branch_filter
     branches:
       only:

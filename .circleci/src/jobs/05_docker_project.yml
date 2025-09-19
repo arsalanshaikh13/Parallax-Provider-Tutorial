@@ -1,0 +1,22 @@
+docker_project:
+  executor:
+    docker:
+      - image: docker:20.10-git
+
+  steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - run:
+        name: git sparse-checkout clone
+        command: |
+          git remote add origin "https://oauth2:${CIRCLECI_PULL_TOKEN}@github.com/arsalanshaikh13/Parallax-Provider-Tutorial.git"
+    - setup_remote_docker: # gives you a remote Docker engine
+        docker_layer_caching: true
+    - run:
+        name: Build Image and Push to DockerHub
+        command: |
+          cd project
+          docker build -t arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1} .
+          echo $DOCKERHUB_PAT | docker login -u $DOCKERHUB_USERNAME --password-stdin
+          docker push arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1}

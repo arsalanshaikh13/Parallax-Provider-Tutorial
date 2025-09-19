@@ -1,9 +1,9 @@
 publish:
   executor: node_executor
   steps:
-    # - checkout
+    - checkout
     - attach_workspace:
-        at: /app
+        at: .
     - run:
         name: Authenticate with npm
         command: |
