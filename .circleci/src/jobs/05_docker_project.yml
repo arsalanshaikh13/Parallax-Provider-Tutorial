@@ -18,14 +18,3 @@ docker_project:
           docker build -t arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1} .
           echo $DOCKERHUB_PAT | docker login -u $DOCKERHUB_USERNAME --password-stdin
           docker push arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1}
-
-
-project
-  src
-    main.css
-    main.js
-  index.html
-  package-lock.json
-  package.json
-  webpack.config.js
-  yarn.lock
