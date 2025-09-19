@@ -6,7 +6,7 @@ docker_project:
     - run:
         name: git sparse-checkout clone
         command: |
-          git clone --no-checkout --sparse --depth=1 "https://${GITHUB_USERNAME}:${GITHUB_PULL_TOKEN}@github.com/${GITHUB_USERNAME}/Parallax-Provider-Tutorial.git"
+          git clone --branch circleci-docker --single-branch --no-checkout --sparse --depth=1 "https://${GITHUB_USERNAME}:${GITHUB_PULL_TOKEN}@github.com/${GITHUB_USERNAME}/Parallax-Provider-Tutorial.git"
           cd Parallax-Provider-Tutorial
           git sparse-checkout set --no-cone "project/*"
           git checkout HEAD
