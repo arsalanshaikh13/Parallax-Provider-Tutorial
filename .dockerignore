@@ -16,3 +16,4 @@ blog/
 dockerinit/
 readmeprep/
 project/
+busybox-deployment.yaml

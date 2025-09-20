@@ -11,14 +11,16 @@ docker_project:
           git sparse-checkout set --no-cone "project/*"
           git checkout HEAD
           git sparse-checkout list
-          ls -lra
+          # ls -lra
     - setup_remote_docker: # gives you a remote Docker engine
         docker_layer_caching: true
     - run:
         name: Build Image and Push to DockerHub
         command: |
-          ls -lra
+          # ls -lra
           cd Parallax-Provider-Tutorial/project
           docker build -t arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1} .
           echo $DOCKERHUB_PAT | docker login -u $DOCKERHUB_USERNAME --password-stdin
           docker push arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1}
+          docker tag arsalanshaikh13/parallaxwebpage:${CIRCLE_SHA1} arsalanshaikh13/parallaxwebpage:latest
+          docker push arsalanshaikh13/parallaxwebpage:latest
